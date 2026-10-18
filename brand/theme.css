@@ -1,0 +1,36 @@
+/* Generated from brand-tokens.json. */
+@theme {
+  --color-brand-blue: #0B5FFF;
+  --color-brand-blue-dark: #083A8C;
+  --color-brand-navy: #102A56;
+  --color-brand-sky: #00B8D9;
+  --color-brand-violet: #7C4DFF;
+  --color-brand-coral: #FF4D6D;
+  --color-brand-orange: #FF8A00;
+  --color-brand-yellow: #FFD43B;
+  --color-brand-green: #35C76F;
+  --color-ink: #17223B;
+  --color-muted: #667085;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f5f7fc;
+  --color-border: #e4e8f1;
+  --radius-sm2: 8px;
+  --radius-md2: 16px;
+  --radius-lg2: 24px;
+  --radius-xl2: 32px;
+  --shadow-card: 0 8px 32px #102a560a;
+  --shadow-lifted: 0 20px 60px #102a5618;
+  --font-display: Poppins, system-ui, sans-serif;
+  --font-sans: Inter, system-ui, sans-serif;
+  --container-prose2: 38rem;
+}
+:root {
+  --blue: #0B5FFF;
+  --navy: #102A56;
+  --ink: #17223B;
+  --muted: #667085;
+  --yellow: #FFD43B;
+  --violet: #7C4DFF;
+  --border: #e4e8f1;
+  --soft: #f5f7fc;
+}

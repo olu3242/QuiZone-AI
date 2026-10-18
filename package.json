@@ -1,29 +1,51 @@
 {
-  "name": "quizone-landing",
+  "name": "quizone",
   "version": "0.1.0",
   "private": true,
-  "description": "QuiZone marketing landing page — public-facing starter kit (Next.js App Router, TypeScript, Tailwind CSS).",
+  "description": "QuiZone guardian-led family learning application",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:db": "node --import tsx --test tests/database.test.ts",
+    "prebuild": "node scripts/generate-brand.mjs",
+    "predev": "node scripts/generate-brand.mjs",
+    "audit": "npm audit --audit-level=low"
   },
   "dependencies": {
-    "next": "16.3.6",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
+    "lucide-react": "1.59.0",
+    "next": "16.3.8",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "@tailwindcss/postcss": "4.3.3",
     "@types/node": "20.14.15",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
-    "autoprefixer": "10.4.20",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.6",
+    "eslint-config-next": "16.3.8",
     "postcss": "8.5.28",
-    "tailwindcss": "3.4.13",
-    "typescript": "5.5.4"
+    "prettier": "3.9.10",
+    "supabase": "2.121.0",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "5.5.4",
+    "fast-glob": "file:tools/next-lint-glob"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next@16.3.8": {
+      "fast-glob": "$fast-glob"
+    }
   }
 }
