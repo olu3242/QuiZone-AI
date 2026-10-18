@@ -1,7 +1,7 @@
 @import "../brand/theme.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source(none);
+@source "./";
+@source "../components";
 
 * {
   box-sizing: border-box;

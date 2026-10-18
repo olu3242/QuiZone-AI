@@ -21,6 +21,7 @@ Requires Node.js 22+.
 
 ```sh
 npm ci
+npm run audit
 npm test
 npm run typecheck
 npm run lint
@@ -47,10 +48,12 @@ See [deployment runbook](docs/DEPLOYMENT.md), [implementation evidence and limit
 
 The automated integration suite uses actual PostgreSQL through PGlite with controlled Auth identity stubs and separate database roles. It exercises the real migration and command functions. It does **not** validate hosted Supabase Auth email delivery, PostgREST embeds, Vercel cookies, browser accessibility, multi-device synchronization, or production recovery.
 
-The connected Supabase account did not contain a QuiZone project, and no matching project was found in the connected Vercel account/team. No hosted migration or production release has been performed.
+The connected Supabase account did not contain a QuiZone project, and the initial Vercel name search did not match. The approved Git upload subsequently identified the existing Vercel project `qui-zone-ai` in `eduradiusllc`, and its repair preview reached READY. No hosted migration or production release has been performed.
 
 ## Remaining PRD scope
 
 Live-model Q and its evaluations; family-member invitations; multi-device host/join game-code flows; timed synchronized QuickZone reveal; richer rubric-based reasoning and submissions; media uploads; cross-household moderated WorldZone and regional comparisons; full multi-step CMS editing/version duplication/retirement; notifications; account export/deletion; legal approval of consent, age bands, and markets; hosted/browser/security/performance certification.
 
 The pilot's 8–17 age range is an implementation default requiring product and legal review, not an approved market policy. Family consent is stored as adult self-attestation; a legally sufficient verifiable parental-consent program is not implemented. Do not invite children to production until the launch gates are closed.
+
+Dependency remediation and Tailwind 4/Next lint compatibility limits are documented in [iteration 2](docs/ITERATION_2_SECURITY.md).

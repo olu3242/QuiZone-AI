@@ -8,13 +8,13 @@ Base commit `ef9ab4e` contained only configuration and documentation. This branc
 
 | Check | Observed result |
 |---|---|
-| Clean dependency install | `npm ci` passed before the final security patch update; patch installs and committed lockfile followed |
-| Final PostgreSQL/domain validation suite | **28 passed, 0 failed, 0 skipped** |
+| Clean dependency install | Clean `npm@10.9.4 ci` passed with the local adapter and final lockfile |
+| Final PostgreSQL/domain validation suite | **31 passed, 0 failed, 0 skipped** |
 | Final typecheck | Passed |
 | Final lint | Passed, no errors or warnings |
 | Final production build | Passed on Next.js **16.3.8**; application pages, route handlers, and proxy emitted |
 | Production dependency audit | **0 known vulnerabilities** reported by `npm audit --omit=dev` |
-| Full dependency audit | **9 unresolved development-tool findings: 7 high, 2 moderate**; see retained audit JSON |
+| Full dependency audit | **0 known vulnerabilities** across runtime and development dependencies; see retained audit JSON |
 | Git whitespace check | Passed before final documentation packaging |
 | Real browser/accessibility/device QA | Not executed; the supported browser-control capability was unavailable |
 | Hosted Auth / email / REST / cookie journeys | Not executed; no connected QuiZone backend |
@@ -44,15 +44,15 @@ The SQL suite runs the real migration and its transactional functions in Postgre
 
 The tests cover unconfirmed/anonymous denial; default-deny permissions; household isolation; forged score/direct-write denial; missing/foreign participants; immutable published versions; out-of-order/replayed answers; pause and expiry enforcement; exactly-once completion scores; all five guided journeys; private passport stamps; durable/idempotent moderation cases and audited decisions; draft publication gates; validated schedules; RLS on every application table; budget and blueprint overspend rejection; and staff/audit impersonation denial.
 
-Next.js was patched from 16.3.6 to 16.3.8 and runtime transitive dependencies refreshed after the initial production audit reported three high-severity dependency findings. The final runtime audit is clean. The complete audit still flags the inherited Tailwind/ESLint glob-related development chain and selector tooling. Suggested upstream resolutions include major toolchain changes or have no direct fixed version; those were not silently applied or marked resolved. These findings remain a release gate.
+Next.js was patched from 16.3.6 to 16.3.8 and runtime transitive dependencies refreshed after the initial production audit reported three high-severity dependency findings. The final runtime audit is clean. Iteration 2 removed the nine development-tool findings using Tailwind 4 and a version-scoped Next lint glob adapter. The final full audit is clean, with no suppressed findings. The expanded suite verifies Next directory resolution, active Next/React Hooks/accessibility lint rules, and compilation of the token-based theme. See `ITERATION_2_SECURITY.md` for the adapter maintenance boundary and browser compatibility requirements.
 
 ## External blockers
 
-The connected Supabase account listed only Velocity projects. No QuiZone database was discovered or altered. No matching QuiZone Vercel project was found in the connected personal scope or Eduradius LLC team. The existing Vercel deployment shown by the user therefore remains outside the currently discovered target connection.
+The connected Supabase account listed only Velocity projects. No QuiZone database was discovered or altered. The initial Vercel name search did not match the existing project. The approved Git upload subsequently identified `qui-zone-ai` in `eduradiusllc`; its initial repair preview reached READY and GitHub verification passed. The Vercel build target is therefore identified, while hosted account/gameplay certification remains pending.
 
-To close hosted E2E, identify/connect the intended QuiZone Supabase and Vercel projects, apply the reviewed migration to a dedicated pilot database, configure the public URL/key/origin and Auth redirect URLs, then execute the hosted acceptance procedure in `DEPLOYMENT.md`. Do not paste privileged credentials in chat.
+To close hosted E2E, connect the intended QuiZone Supabase project and configure it on the identified Vercel project, apply the reviewed migration to a dedicated pilot database, configure the public URL/key/origin and Auth redirect URLs, then execute the hosted acceptance procedure in `DEPLOYMENT.md`. Do not paste privileged credentials in chat.
 
-Before inviting children to production, resolve development-tool advisories, approve age bands and an appropriate parental-consent program, finish account/privacy controls, and complete hosted isolation, email, browser accessibility, load, and backup/recovery verification. The 8–17 pilot range and adult self-attestation are implementation defaults, not legal or market approval.
+Before inviting children to production, approve age bands and an appropriate parental-consent program, finish account/privacy controls, and complete hosted isolation, email, browser accessibility, load, and backup/recovery verification. The 8–17 pilot range and adult self-attestation are implementation defaults, not legal or market approval.
 
 ## Source handoff state
 

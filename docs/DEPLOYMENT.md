@@ -5,7 +5,8 @@
 - Repository: `olu3242/QuiZone-AI`
 - Repair branch: `work/quizone-e2e-20261018`
 - Base: `ef9ab4e123a21987606da6f5b8671895764249b1`
-- Framework: existing Next.js App Router, React 18, TypeScript, Tailwind 3.
+- Framework: existing Next.js App Router, React 18, TypeScript, Tailwind 4.
+- Existing Vercel project identified by the approved Git upload: `qui-zone-ai` (`prj_At3aDMHerUaIExGySYmhvZEslB49`) in `eduradiusllc`. Its initial repair preview reached READY.
 - Hosting target: existing Vercel project from the failed build. No replacement Site or production project has been created.
 
 ## Database preparation
@@ -48,7 +49,7 @@ Push to the repair branch and inspect its Git-connected preview deployment. The 
 12. Create a challenge draft; verify it cannot be played; explicitly review age appropriateness; publish; complete a session against that exact immutable version.
 13. Expire a session using a controlled test database; verify no further answer or score is accepted. Test refresh/offline/reconnect and a second device with the same guardian.
 14. Inspect accessibility at 390, 1024, and 1440 pixels: keyboard focus, native modal, radios, error announcements, readable timer, reduced motion, contrast, and landscape presentation.
-15. Run Supabase security/performance advisors, dependency audit, production build, and load/recovery tests. Reconcile findings before production.
+15. Run Supabase security/performance advisors, `npm run audit`, production build, and load/recovery tests. Reconcile findings before production.
 
 ## Release and recovery
 

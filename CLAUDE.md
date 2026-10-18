@@ -21,7 +21,7 @@ and the PRD when they conflict.
 
 ## Tech stack
 
-Next.js (App Router) · TypeScript (strict) · Tailwind CSS 3 · React 18.
+Next.js (App Router) · TypeScript (strict) · Tailwind CSS 4 · React 18.
 Later waves add Supabase (Postgres/Auth/Realtime/Storage) and Vercel — see
 `.env.example` for the variables that will matter then. Nothing here needs
 any environment variable to run.
@@ -46,9 +46,9 @@ in the same change.
   must be data-driven" principle the full product will follow later.
 - **Components are small and single-purpose** (`components/*.tsx`), composed
   in `app/page.tsx`. Don't grow one component to cover two sections.
-- **Brand tokens are the source of truth.** `tailwind.config.ts` reads
-  `brand/brand-tokens.json` directly — if a token changes, change it there,
-  not by hand-editing hex codes into the Tailwind config or a component.
+- **Brand tokens are the source of truth.** `scripts/generate-brand.mjs` reads
+  `brand/brand-tokens.json` and emits `brand/theme.css` for Tailwind 4 — if a token changes, change it there,
+  not by hand-editing hex codes into the generated theme or a component.
 - **Fonts load via `<link>` in `app/layout.tsx`**, not `next/font/google`.
   This was a deliberate choice (see the comment in that file) so the build
   doesn't require network access to fonts.googleapis.com — keep it this way
