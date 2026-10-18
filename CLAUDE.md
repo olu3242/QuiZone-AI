@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+> Current repair branch (2026-10-18): the missing application has been implemented as a guardian-led, shared-screen pilot. Read `docs/IMPLEMENTATION_STATUS.md` for the actual built scope, observed verification, and remaining launch gates. The starter-kit descriptions below are historical context; preserve their architectural and safety rules. No hosted E2E certification has been performed.
+
 Instructions for Claude (via Claude Code or any agentic coding session)
 working in this repository.
 

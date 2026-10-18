@@ -1,5 +1,7 @@
 # QuiZone — Product Requirements Document
 
+**Implementation note (2026-10-18):** See `docs/IMPLEMENTATION_STATUS.md` for the shared-screen pilot actually implemented on the repair branch. This PRD remains the target scope; its broader feature list is not a completion claim.
+
 **Status:** Living document. This PRD is an internal engineering artifact — unlike the
 public landing page, it's meant to hold the full picture, including things that
 should never appear in consumer-facing copy (see `FAMILY.md` and `CLAUDE.md` for

@@ -1,0 +1,23 @@
+{
+  "brand": {
+    "primary": "#0B5FFF",
+    "primaryDark": "#083A8C",
+    "navy": "#102A56",
+    "sky": "#00B8D9",
+    "violet": "#7C4DFF",
+    "coral": "#FF4D6D",
+    "orange": "#FF8A00",
+    "yellow": "#FFD43B",
+    "green": "#35C76F",
+    "ink": "#17223B",
+    "muted": "#667085",
+    "surface": "#ffffff",
+    "surfaceSoft": "#f5f7fc",
+    "border": "#e4e8f1"
+  },
+  "radius": { "sm": "8px", "md": "16px", "lg": "24px", "xl": "32px" },
+  "shadow": {
+    "card": "0 8px 32px #102a560a",
+    "lifted": "0 20px 60px #102a5618"
+  }
+}
