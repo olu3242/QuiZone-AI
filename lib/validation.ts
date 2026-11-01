@@ -232,6 +232,51 @@ export const actionSchema = z.discriminatedUnion("action", [
     }),
   }),
   z.object({
+    action: z.literal("cms_step_add"),
+    data: z
+      .object({
+        prompt: z.string().trim().min(10).max(500),
+        options: z.array(z.string().trim().min(1).max(150)).min(2).max(6),
+        correct: z.number().int().min(0).max(5),
+        hint: z.string().trim().min(10).max(300),
+        explanation: z.string().trim().min(10).max(500),
+      })
+      .extend({ version: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_step_update"),
+    data: z
+      .object({
+        prompt: z.string().trim().min(10).max(500),
+        options: z.array(z.string().trim().min(1).max(150)).min(2).max(6),
+        correct: z.number().int().min(0).max(5),
+        hint: z.string().trim().min(10).max(300),
+        explanation: z.string().trim().min(10).max(500),
+      })
+      .extend({ step: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_step_delete"),
+    data: z.object({ step: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_version_update"),
+    data: z.object({
+      version: z.string().uuid(),
+      scenario: z.string().trim().min(20).max(1000),
+      minAge: z.number().int().min(8).max(17),
+      maxAge: z.number().int().min(8).max(17),
+    }),
+  }),
+  z.object({
+    action: z.literal("cms_version_new"),
+    data: z.object({ challenge: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_version_retire"),
+    data: z.object({ version: z.string().uuid() }),
+  }),
+  z.object({
     action: z.literal("child_archive"),
     data: z.object({ child: z.string().uuid(), archived: z.boolean() }),
   }),
@@ -356,7 +401,15 @@ export const safezoneConsentSchema = z.discriminatedUnion("action", [
     }),
   }),
 ]);
-export const adminActions = ["cms_meta"] as const;
+export const adminActions = [
+  "cms_meta",
+  "cms_step_add",
+  "cms_step_update",
+  "cms_step_delete",
+  "cms_version_update",
+  "cms_version_new",
+  "cms_version_retire",
+] as const;
 export const moderatorActions = [
   "sz_hall_create",
   "sz_hall_state",

@@ -3771,3 +3771,23 @@ input[type="radio"] {
 .meta-editor {
   margin: 10px 0;
 }
+.cms-versions {
+  margin-top: 12px;
+}
+.cms-draft {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+}
+.cms-draft h4 {
+  margin-bottom: 10px;
+}
+.cms-step {
+  margin: 10px 0;
+}
+.cms-step summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+}

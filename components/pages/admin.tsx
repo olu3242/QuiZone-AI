@@ -4,6 +4,7 @@ import type { AppAction } from "@/lib/validation";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
+import { CmsVersions } from "../cms-editor";
 import { Empty, Feedback, Heading, zoneFor } from "../family-ui";
 import { command, useFamily } from "../workspace";
 export function AdminPage() {
@@ -108,6 +109,7 @@ export function AdminPage() {
                   )}
                 </div>
               ))}
+              <CmsVersions challenge={c} busy={busy} run={execute} />
             </article>
           ))}
           <h2>Moderation queue</h2>

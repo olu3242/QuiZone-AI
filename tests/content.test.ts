@@ -106,3 +106,253 @@ test("QZ-21: only admins edit metadata; values are constrained and audited", asy
     difficulty: "starter",
   });
 });
+
+const step = (over: Record<string, unknown> = {}) => ({
+  prompt: "Which planet has the most moons?",
+  options: ["Saturn", "Mars", "Venus"],
+  correct: 0,
+  hint: "Think about the ringed giant.",
+  explanation: "Saturn has the most confirmed moons.",
+  ...over,
+});
+const versions = async (cid: string) =>
+  h.rows<{ id: string; version: number; status: string }>(
+    "select id,version,status from public.challenge_versions where challenge_id=$1 order by version",
+    [cid],
+  );
+const cms = async (vid: string) =>
+  (
+    (await h.as(ADMIN, "select public.qz_cms_version($1) r", [vid]))
+      .rows[0] as { r: any }
+  ).r;
+let quick: string, v2: string, oldSession: string;
+
+test("QZ-22: a new version copies the published content into a single open draft", async () => {
+  quick = await challenge("quick");
+  const kid =
+    (await h.cmd(G, "child", {
+      nickname: "Vers",
+      age: 10,
+      avatar: "fox",
+      interest: "science",
+    }),
+    (
+      await h.one<{ id: string }>(
+        "select id from public.child_profiles where nickname='Vers'",
+      )
+    ).id);
+  oldSession = (
+    (await h.cmd(G, "create", { challenge: quick, children: [kid] })) as {
+      session: string;
+    }
+  ).session;
+  await assert.rejects(
+    () => h.cmd(G, "cms_version_new", { challenge: quick }),
+    /administrator/,
+  );
+  v2 = (
+    (await h.cmd(ADMIN, "cms_version_new", { challenge: quick })) as {
+      version: string;
+    }
+  ).version;
+  await assert.rejects(
+    () => h.cmd(ADMIN, "cms_version_new", { challenge: quick }),
+    /open draft/,
+  );
+  const view = await cms(v2);
+  assert.equal(view.status, "draft");
+  assert.equal(view.steps.length, 3);
+  assert.equal(
+    typeof view.steps[0].correct,
+    "number",
+    "admin view includes answer keys",
+  );
+  await assert.rejects(
+    () => h.as(G, "select public.qz_cms_version($1)", [v2]),
+    /administrator/,
+  );
+});
+
+test("QZ-22: drafts are editable step by step; published steps are not", async () => {
+  const added = (
+    (await h.cmd(ADMIN, "cms_step_add", { version: v2, ...step() })) as {
+      step: string;
+    }
+  ).step;
+  await h.cmd(ADMIN, "cms_step_update", {
+    step: added,
+    ...step({ correct: 1, options: ["Mars", "Saturn"] }),
+  });
+  let view = await cms(v2);
+  assert.equal(view.steps.length, 4);
+  assert.equal(view.steps[3].correct, 1);
+  await h.cmd(ADMIN, "cms_step_delete", { step: view.steps[0].id });
+  view = await cms(v2);
+  assert.deepEqual(
+    view.steps.map((s: { ordinal: number }) => s.ordinal),
+    [1, 2, 3],
+    "ordinals renumbered; the delete really happened",
+  );
+  await assert.rejects(
+    () =>
+      h.cmd(ADMIN, "cms_step_add", {
+        version: v2,
+        ...step({ options: ["Only one"] }),
+      }),
+    /Invalid step/,
+  );
+  const published = (await versions(quick)).find(
+    (v) => v.status === "published",
+  )!;
+  const pubStep = (
+    await h.one<{ id: string }>(
+      "select id from public.challenge_steps where version_id=$1 limit 1",
+      [published.id],
+    )
+  ).id;
+  await assert.rejects(
+    () => h.cmd(ADMIN, "cms_step_update", { step: pubStep, ...step() }),
+    /Only draft versions/,
+  );
+  await h.cmd(ADMIN, "cms_version_update", {
+    version: v2,
+    scenario:
+      "A refreshed set of quick science questions for curious families.",
+    minAge: 9,
+    maxAge: 14,
+  });
+  assert.equal(
+    (await cms(v2)).ageReviewed,
+    false,
+    "editing resets the age review",
+  );
+});
+
+test("QZ-22: publishing a new version retires the old one; past sessions keep their content", async () => {
+  await h.cmd(ADMIN, "publish", { version: v2, ageReviewed: true });
+  const vs = await versions(quick);
+  assert.deepEqual(
+    vs.map((v) => v.status),
+    ["retired", "published"],
+  );
+  const old = await h.one<{ challenge_version_id: string }>(
+    "select challenge_version_id from public.game_sessions where id=$1",
+    [oldSession],
+  );
+  assert.equal(
+    old.challenge_version_id,
+    vs[0].id,
+    "the existing session still points at v1",
+  );
+  assert.equal(
+    Number(
+      (
+        await h.one<{ n: string }>(
+          "select count(*) n from public.challenge_steps where version_id=$1",
+          [vs[0].id],
+        )
+      ).n,
+    ),
+    3,
+    "v1 steps intact",
+  );
+  await h.db.query("update public.game_sessions set state='cancelled'");
+  const kid = (
+    await h.one<{ id: string }>(
+      "select id from public.child_profiles where nickname='Vers'",
+    )
+  ).id;
+  const fresh = (
+    (await h.cmd(G, "create", { challenge: quick, children: [kid] })) as {
+      session: string;
+    }
+  ).session;
+  assert.equal(
+    (
+      await h.one<{ challenge_version_id: string }>(
+        "select challenge_version_id from public.game_sessions where id=$1",
+        [fresh],
+      )
+    ).challenge_version_id,
+    v2,
+  );
+});
+
+test("QZ-22: immutability still holds except published → retired", async () => {
+  await assert.rejects(
+    () =>
+      h.db.query(
+        "update public.challenge_versions set scenario='Tampered scenario text here' where id=$1",
+        [v2],
+      ),
+    /immutable/,
+  );
+  await assert.rejects(
+    () =>
+      h.db.query(
+        "update public.challenge_versions set status='retired', scenario='Tampered while retiring' where id=$1",
+        [v2],
+      ),
+    /immutable/,
+  );
+  await assert.rejects(
+    () =>
+      h.db.query(
+        "update public.challenge_versions set status='draft' where id=$1",
+        [v2],
+      ),
+    /immutable/,
+  );
+  await h.cmd(ADMIN, "cms_version_retire", { version: v2 });
+  await assert.rejects(
+    () => h.cmd(ADMIN, "cms_version_retire", { version: v2 }),
+    /Only a published/,
+  );
+  const kid = (
+    await h.one<{ id: string }>(
+      "select id from public.child_profiles where nickname='Vers'",
+    )
+  ).id;
+  await h.db.query("update public.game_sessions set state='cancelled'");
+  await assert.rejects(
+    () => h.cmd(G, "create", { challenge: quick, children: [kid] }),
+    /unavailable/,
+  );
+});
+
+test("QZ-22: non-choice steps (allocation/blueprint) are copied but not editable in the CMS", async () => {
+  const solve = await challenge("solve");
+  const vid = (
+    (await h.cmd(ADMIN, "cms_version_new", { challenge: solve })) as {
+      version: string;
+    }
+  ).version;
+  const view = await cms(vid);
+  const alloc = view.steps.find(
+    (s: { kind: string }) => s.kind === "allocation",
+  );
+  assert.ok(alloc);
+  await assert.rejects(
+    () => h.cmd(ADMIN, "cms_step_update", { step: alloc.id, ...step() }),
+    /edited in code/,
+  );
+});
+
+test("QZ-22: quality findings are reported for drafts", async () => {
+  const build = await challenge("build");
+  const vid = (
+    (await h.cmd(ADMIN, "cms_version_new", { challenge: build })) as {
+      version: string;
+    }
+  ).version;
+  await h.cmd(ADMIN, "cms_step_add", {
+    version: vid,
+    ...step({
+      options: ["Same", "same "],
+      hint: "Saturn has the most confirmed moons.",
+    }),
+  });
+  const issues: string[] = (await cms(vid)).issues;
+  assert.ok(issues.some((i) => /duplicate options/.test(i)));
+  assert.ok(issues.some((i) => /gives the answer away/.test(i)));
+});
