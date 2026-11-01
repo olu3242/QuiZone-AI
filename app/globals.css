@@ -3824,3 +3824,51 @@ input[type="radio"] {
   background: #ecf8fb;
   color: #0b5466;
 }
+
+/* QZ-26 progress */
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.progress-card h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.progress-card p {
+  font-size: 12px;
+  margin: 4px 0;
+}
+.skill-bars {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  font-size: 11px;
+}
+.skill-bars li {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.skill-bars .bar {
+  height: 8px;
+  background: #edf0f5;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.skill-bars .bar > span {
+  display: block;
+  height: 100%;
+  background: #0b5fff;
+}
+.history-more {
+  justify-content: flex-start;
+  margin: 8px 0 24px;
+}
+.progress-note {
+  font-size: 11px;
+  margin-top: 8px;
+}

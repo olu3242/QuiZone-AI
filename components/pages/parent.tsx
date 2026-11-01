@@ -23,13 +23,49 @@ import {
 } from "../family-ui";
 import { command, useFamily } from "../workspace";
 import { SafeZoneGuardianSummary } from "../safezone/guardian-summary";
+import { ProgressPanel } from "../progress-panel";
+import type { Session } from "@/lib/types";
 export function ParentPage() {
   const { data, refresh } = useFamily(),
     [message, setMessage] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [visible, setVisible] = useState(5),
+    [older, setOlder] = useState<Session[]>([]),
+    [olderMore, setOlderMore] = useState(true),
+    [loadingOlder, setLoadingOlder] = useState(false),
+    [historyError, setHistoryError] = useState("");
   if (!data) return null;
   if (!data.household) return <NeedHousehold />;
-  const complete = data.sessions.filter((s) => s.state === "complete");
+  const recent = data.sessions.filter((s) => s.state === "complete");
+  const complete = [
+    ...recent,
+    ...older.filter((o) => !recent.some((r) => r.id === o.id)),
+  ];
+  // The snapshot holds the newest 100 sessions; older ones page in from the server.
+  const canLoadOlder = olderMore && data.sessions.length >= 100;
+  async function loadOlder() {
+    const last = complete[complete.length - 1];
+    if (!last) return;
+    setLoadingOlder(true);
+    setHistoryError("");
+    try {
+      const r = await fetch(
+        `/api/history?before=${encodeURIComponent(last.created_at)}`,
+        { cache: "no-store" },
+      );
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error);
+      setOlder((o) => [...o, ...j.sessions]);
+      setOlderMore(j.more);
+      setVisible((v) => v + j.sessions.length);
+    } catch (e) {
+      setHistoryError(
+        e instanceof Error ? e.message : "Could not load older adventures.",
+      );
+    } finally {
+      setLoadingOlder(false);
+    }
+  }
   async function schedule(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
@@ -102,7 +138,7 @@ export function ParentPage() {
               label="Choose an adventure"
             />
           ) : (
-            complete.map((s) => {
+            complete.slice(0, visible).map((s) => {
               const c = challengeFor(s, data);
               return (
                 <article className="panel summary-card" key={s.id}>
@@ -124,13 +160,15 @@ export function ParentPage() {
                   </div>
                   <p>
                     <strong>Practiced:</strong>{" "}
-                    {[
-                      ...new Set(
-                        data.scores
-                          .filter((x) => x.session_id === s.id)
-                          .map((x) => x.skill),
-                      ),
-                    ].join(", ")}
+                    {s.practice
+                      ? "practice round, not recorded as progress"
+                      : [
+                          ...new Set(
+                            data.scores
+                              .filter((x) => x.session_id === s.id)
+                              .map((x) => x.skill),
+                          ),
+                        ].join(", ")}
                   </p>
                   <p className="conversation">
                     <strong>Try asking:</strong> “What made you choose your
@@ -140,6 +178,31 @@ export function ParentPage() {
               );
             })
           )}
+          {historyError && (
+            <p className="notice error" role="alert">
+              {historyError}
+            </p>
+          )}
+          <div className="card-actions history-more">
+            {visible < complete.length && (
+              <button
+                className="btn small secondary"
+                onClick={() => setVisible((v) => v + 5)}
+              >
+                Show more ({complete.length - visible} more)
+              </button>
+            )}
+            {visible >= complete.length && canLoadOlder && (
+              <button
+                className="btn small secondary"
+                disabled={loadingOlder}
+                onClick={() => void loadOlder()}
+              >
+                {loadingOlder ? "Loading…" : "Load older adventures"}
+              </button>
+            )}
+          </div>
+          <ProgressPanel data={data} />
           <div className="mini-heading">
             <h2>Q’s hint history</h2>
           </div>
