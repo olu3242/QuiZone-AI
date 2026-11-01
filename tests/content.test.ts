@@ -356,3 +356,26 @@ test("QZ-22: quality findings are reported for drafts", async () => {
   assert.ok(issues.some((i) => /duplicate options/.test(i)));
   assert.ok(issues.some((i) => /gives the answer away/.test(i)));
 });
+
+test("QZ-22: literal-message quality checks report instead of erroring (WorldZone country)", async () => {
+  await h.cmd(ADMIN, "draft", {
+    mode: "world",
+    title: "Rivers of the world",
+    scenario: "Explore how rivers shape the cities that grow beside them.",
+    prompt: "Which river flows through Cairo?",
+    options: ["The Nile", "The Thames"],
+    correct: 0,
+    hint: "It is one of the longest rivers on Earth.",
+    explanation: "The Nile flows through Cairo, Egypt.",
+  });
+  const vid = (
+    await h.one<{ id: string }>(
+      "select v.id from public.challenge_versions v join public.challenges c on c.id=v.challenge_id where c.title='Rivers of the world'",
+    )
+  ).id;
+  const issues: string[] = (await cms(vid)).issues;
+  assert.ok(
+    issues.includes("WorldZone challenges need a country"),
+    JSON.stringify(issues),
+  );
+});

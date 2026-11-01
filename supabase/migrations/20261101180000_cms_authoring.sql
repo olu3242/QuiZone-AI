@@ -29,20 +29,20 @@ declare v public.challenge_versions; c public.challenges; s record; issues text[
 begin
  select * into v from public.challenge_versions where id=vid;
  select * into c from public.challenges where id=v.challenge_id;
- if length(coalesce(v.scenario,'')) < 20 then issues:=issues||'Scenario must be at least 20 characters'; end if;
- if c.mode='world' and c.country is null then issues:=issues||'WorldZone challenges need a country'; end if;
+ if length(coalesce(v.scenario,'')) < 20 then issues:=array_append(issues,'Scenario must be at least 20 characters'); end if;
+ if c.mode='world' and c.country is null then issues:=array_append(issues,'WorldZone challenges need a country'); end if;
  for s in select st.ordinal, st.kind, st.prompt, st.options, st.hint, k.correct, k.explanation from public.challenge_steps st left join private.answer_keys k on k.step_id=st.id where st.version_id=vid order by st.ordinal loop
   n:=n+1;
-  if s.correct is null or s.explanation is null then issues:=issues||format('Step %s has no answer key',s.ordinal); continue; end if;
+  if s.correct is null or s.explanation is null then issues:=array_append(issues,format('Step %s has no answer key',s.ordinal)); continue; end if;
   if s.kind='choice' then
-   if (select count(distinct lower(trim(o #>> '{}'))) from jsonb_array_elements(s.options) o) < jsonb_array_length(s.options) then issues:=issues||format('Step %s has duplicate options',s.ordinal); end if;
-   if s.correct >= jsonb_array_length(s.options) then issues:=issues||format('Step %s marks a missing option as correct',s.ordinal); end if;
+   if (select count(distinct lower(trim(o #>> '{}'))) from jsonb_array_elements(s.options) o) < jsonb_array_length(s.options) then issues:=array_append(issues,format('Step %s has duplicate options',s.ordinal)); end if;
+   if s.correct >= jsonb_array_length(s.options) then issues:=array_append(issues,format('Step %s marks a missing option as correct',s.ordinal)); end if;
   end if;
-  if length(s.prompt) < 10 then issues:=issues||format('Step %s prompt is too short',s.ordinal); end if;
-  if length(s.explanation) < 10 then issues:=issues||format('Step %s needs an explanation',s.ordinal); end if;
-  if lower(trim(s.hint))=lower(trim(s.explanation)) then issues:=issues||format('Step %s hint gives the answer away (same as explanation)',s.ordinal); end if;
+  if length(s.prompt) < 10 then issues:=array_append(issues,format('Step %s prompt is too short',s.ordinal)); end if;
+  if length(s.explanation) < 10 then issues:=array_append(issues,format('Step %s needs an explanation',s.ordinal)); end if;
+  if lower(trim(s.hint))=lower(trim(s.explanation)) then issues:=array_append(issues,format('Step %s hint gives the answer away (same as explanation)',s.ordinal)); end if;
  end loop;
- if n=0 then issues:=issues||'Add at least one step'; end if;
+ if n=0 then issues:=array_append(issues,'Add at least one step'); end if;
  return issues;
 end$$;
 revoke all on function private.quality_issues(uuid) from public, anon, authenticated;
