@@ -1,5 +1,5 @@
 "use client";
-import { zones } from "@/lib/content";
+import { zoneOpen, zones } from "@/lib/content";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -81,13 +81,20 @@ export function ChallengesPage({
               <ChallengeCard challenge={c} />
               <button
                 className="btn secondary full"
+                disabled={!zoneOpen(data.flags, c.mode)}
                 onClick={() => {
                   setSelected(c.id);
                   setPlayers(crew.map((c) => c.id));
                   setError("");
                 }}
               >
-                Choose this adventure <ArrowRight size={16} />
+                {zoneOpen(data.flags, c.mode) ? (
+                  <>
+                    Choose this adventure <ArrowRight size={16} />
+                  </>
+                ) : (
+                  "Paused for now"
+                )}
               </button>
             </div>
           ))}

@@ -69,6 +69,7 @@ export type Snapshot = {
   schedules: { id: string; scheduled_at: string; mode: string }[];
   qLogs: { id: string; output: string; created_at: string }[];
   admin: boolean;
+  flags: Record<string, boolean>;
   cases: { id: string; reason: string; status: string; created_at: string }[];
 };
 

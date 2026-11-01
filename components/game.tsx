@@ -28,7 +28,8 @@ export function Game({
   initialData: GameData;
   initialNow: number;
 }) {
-  const { refresh } = useFamily();
+  const { data: family, refresh } = useFamily();
+  const hintsPaused = family?.flags?.q_hints === false;
   const router = useRouter();
   const [game, setGame] = useState<GameData | null>(initialData),
     [error, setError] = useState(""),
@@ -402,12 +403,16 @@ export function Game({
               )}
               <button
                 className="btn secondary full"
-                disabled={busy}
+                disabled={busy || hintsPaused}
                 onClick={() => void act("hint", {})}
               >
                 <Sparkles size={16} /> Ask for a hint
               </button>
-              <small>A guardian can enable hints in Family preferences.</small>
+              <small>
+                {hintsPaused
+                  ? "Hints are paused right now."
+                  : "A guardian can enable hints in Family preferences."}
+              </small>
             </div>
           </aside>
         </div>

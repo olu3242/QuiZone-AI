@@ -1,27 +1,29 @@
 # QuiZone AI — integration matrix (shared services × modules)
 
-✅ integrated and tested · ◐ integrated, browser-untested · — not applicable · ✗ gap
+✅ integrated and browser-tested on a real Supabase stack · ◐ integrated, DB-tested only · — not applicable · ✗ gap
 
-| Shared service                  | QuizZone | BuildZone | DebateZone | SafeZone                                      | Game Night | Global Connect | Q     |
-| ------------------------------- | -------- | --------- | ---------- | --------------------------------------------- | ---------- | -------------- | ----- |
-| Guardian identity (one account) | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | ✅    |
-| Shared child profile            | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | ✅    |
-| Archived explorers excluded     | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | —     |
-| Age eligibility (server)        | ✅       | ◐         | ◐          | ✅                                            | ✅         | ◐              | —     |
-| Guardian permission gate        | —        | —         | —          | ✅                                            | —          | ◐ (World)      | ◐ (Q) |
-| Household isolation (RLS + API) | ✅       | ◐         | ◐          | ✅                                            | ✅         | ◐              | ◐     |
-| Server-authoritative scoring    | ✅       | ◐         | ◐          | —                                             | ✅         | ◐              | —     |
-| XP / skills / passport          | ✅       | ◐         | ◐          | ✗ (participation shown in Parent Hub, not XP) | ✅         | ◐              | —     |
-| Parent Hub oversight            | ✅       | ◐         | ◐          | ✅                                            | ✅         | ◐              | ◐     |
-| Reporting & moderation          | ✅       | ◐         | ◐          | ✅                                            | ✅         | ◐              | —     |
-| Audit trail                     | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | ✅    |
-| Rate limits                     | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | ✅    |
-| Data export                     | ✅       | ✅        | ✅         | ✅ (v2)                                       | ✅         | ✅             | ✅    |
-| Cascade deletion                | ✅       | ✅        | ✅         | ✅                                            | ✅         | ✅             | ✅    |
-| Feature flag                    | —        | —         | —          | ✅                                            | —          | ✗              | ✗     |
+| Shared service                                 | QuizZone                   | SolveZone       | BuildZone       | DebateZone       | SafeZone                                         | Game Night        | WorldZone       | Q hints              |
+| ---------------------------------------------- | -------------------------- | --------------- | --------------- | ---------------- | ------------------------------------------------ | ----------------- | --------------- | -------------------- |
+| Guardian identity (one account)                | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Shared child profile                           | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Archived explorers excluded                    | ✅                         | ◐               | ◐               | ◐                | ✅                                               | ✅                | ◐               | —                    |
+| Age eligibility (server)                       | ✅                         | ◐               | ◐               | ◐                | ✅                                               | ✅                | ◐               | —                    |
+| Guardian permission gate                       | —                          | —               | —               | —                | ✅                                               | —                 | ✅              | ✅                   |
+| Household isolation (RLS + API)                | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Server-authoritative scoring                   | ✅                         | ✅ (budget)     | ✅ (cost)       | ✅               | —                                                | ✅                | ✅              | —                    |
+| XP / skills / passport                         | ✅                         | ✅              | ✅              | ✅               | ✗ (by design; participation shown in Parent Hub) | ✅                | ✅ (stamp)      | —                    |
+| Parent Hub oversight                           | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅ (hint log)        |
+| Reporting & moderation                         | ✅ (report → admin review) | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | —                    |
+| Audit trail                                    | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Rate limits                                    | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅ (+10/session cap) |
+| Data export (v2)                               | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Cascade deletion                               | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
+| Operator feature flag                          | ✅ `zone_quick`            | ✅ `zone_solve` | ✅ `zone_build` | ✅ `zone_debate` | ✅ `safezone` (off)                              | ✅ via zone flags | ✅ `zone_world` | ✅ `q_hints`         |
+| Content via CMS (draft → age review → publish) | ✅                         | ◐               | ◐               | ◐                | own console                                      | —                 | ◐               | —                    |
+| Accessibility (axe AA, 390 + desktop)          | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 
-## Open integration gaps
+"Server-authoritative" means the client can't change an outcome. SolveZone overspend and BuildZone over-budget designs are refused by the server even when the UI is bypassed (E2E zones 1–2).
 
-1. Browser journeys for BuildZone, DebateZone, Global Connect, Q, and the game-side report → staff review flow (all ◐). These are the cheapest way to turn ◐ into ✅.
-2. SafeZone participation doesn't award XP or skills. This is deliberate for now: rewarding volume in a civic space could encourage low-quality participation. Needs a product decision on what, if anything, to recognize.
-3. Global Connect and Q aren't behind feature flags, although both are partial.
+## Remaining ◐ (DB-tested, no browser journey)
+
+Archived-explorer and age-band refusals for the non-Quick zones use the same server path that the QuickZone and SafeZone browser tests already cover. A CMS-authored Solve/Build/Debate/World challenge would need multi-step CMS editing (QZ-07) before it can be authored in the UI.

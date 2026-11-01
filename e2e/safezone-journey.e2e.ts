@@ -68,6 +68,8 @@ before(async () => {
 });
 after(async () => {
   await browser?.close();
+  // Never leave SafeZone enabled behind a test run (matters on hosted UAT).
+  operatorSql("update private.feature_flags set enabled=false where flag='safezone'");
 });
 
 test("1. SafeZone is closed to families until an operator enables it", async () => {

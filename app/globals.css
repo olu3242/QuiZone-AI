@@ -2158,7 +2158,7 @@ input[type="radio"] {
 }
 .q-card small {
   font-size: 9px;
-  color: #7d7195;
+  color: #706586;
   line-height: 1.8;
   display: block;
 }
@@ -3406,8 +3406,8 @@ input[type="radio"] {
 .game-footer select {
   background: white;
 }
-.allocation{margin-top:25px}.budget-summary{background:#eef4ff;border-radius:13px;padding:20px;margin-bottom:22px}.budget-summary>span{font-size:10px;color:#5273a6}.budget-summary>strong{float:right;font-size:20px;color:var(--blue)}.budget-summary .xp-track{margin-top:20px;background:#dce7f8}.budget-summary p{font-size:10px}.allocation-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.allocation-grid label>span{font-size:11px}.allocation>.btn{margin-top:20px}
-.design-choice{display:flex;gap:12px;align-items:center;padding:15px;border:1px solid var(--border);border-radius:12px;margin-bottom:12px}.design-choice strong{font-size:12px;flex:1}.design-choice>span{font-size:11px;color:var(--muted)}.shelter-preview{text-align:center;background:#f2ecff;border-radius:14px;padding:24px;margin-bottom:20px;color:var(--violet)}.shelter-preview>span{font-size:55px;line-height:1}.shelter-preview>div{font-size:35px}.shelter-preview p{font-size:11px;color:#7b68a1;margin-top:10px}
+.allocation{margin-top:25px}.budget-summary{background:#eef4ff;border-radius:13px;padding:20px;margin-bottom:22px}.budget-summary>span{font-size:10px;color: #4f6fa1}.budget-summary>strong{float:right;font-size:20px;color:var(--blue)}.budget-summary .xp-track{margin-top:20px;background:#dce7f8}.budget-summary p{font-size:10px}.allocation-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.allocation-grid label>span{font-size:11px}.allocation>.btn{margin-top:20px}
+.design-choice{display:flex;gap:12px;align-items:center;padding:15px;border:1px solid var(--border);border-radius:12px;margin-bottom:12px}.design-choice strong{font-size:12px;flex:1}.design-choice>span{font-size:11px;color:var(--muted)}.shelter-preview{text-align:center;background:#f2ecff;border-radius:14px;padding:24px;margin-bottom:20px;color:var(--violet)}.shelter-preview>span{font-size:55px;line-height:1}.shelter-preview>div{font-size:35px}.shelter-preview p{font-size:11px;color: #746298;margin-top:10px}
 
 /* QZ-02 guardian data controls */
 .btn.danger {

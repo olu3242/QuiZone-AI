@@ -38,7 +38,7 @@ flowchart TB
 | Moderation & safety     | `moderation_cases` (game), `safezone_reports` + events (town halls), staff roles                                                            | Game zones, SafeZone                                       |
 | Audit                   | `audit_events` written by every command                                                                                                     | All                                                        |
 | Rate limiting           | `private.rate_limit` (reauth, export, command)                                                                                              | All                                                        |
-| Feature flags           | `private.feature_flags` (operator SQL)                                                                                                      | SafeZone (more to follow)                                  |
+| Feature flags           | `private.feature_flags` (operator SQL), enforced by triggers                                                                                | Every game zone (`zone_*`), Q hints, SafeZone              |
 | AI                      | Curated hints with an `ai_evaluations` log; no live provider                                                                                | Q (hints)                                                  |
 | Data rights             | Export v2 (all zones incl. SafeZone), cascading deletion                                                                                    | All                                                        |
 

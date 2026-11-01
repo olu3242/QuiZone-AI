@@ -23,6 +23,7 @@ const fn = async (sig: string) =>
   ).r !== null;
 const down = (file: string) =>
   h.db.exec(readFileSync("supabase/rollback/" + file, "utf8"));
+const downNamed = (name: string) => down(downs.find((f) => f.includes(name))!);
 const up = (file: string) =>
   h.db.exec(readFileSync("supabase/migrations/" + file, "utf8"));
 
@@ -46,8 +47,11 @@ test("every post-pilot migration has a matching down script", () => {
 });
 
 test("stepwise rollback leaves a working schema at every stage", async () => {
+  // zone flags → kill switches gone, zones still playable
+  await downNamed("_zone_flags");
+  assert.equal(await fn("public.qz_flags()"), false);
   // hardening → rate limiting gone, router still serves SafeZone
-  await down(downs[0]);
+  await downNamed("_hardening");
   assert.equal(await exists("private.rate_events"), false);
   assert.equal(await fn("public.qz_rate(text)"), false);
   await assert.rejects(
@@ -55,7 +59,7 @@ test("stepwise rollback leaves a working schema at every stage", async () => {
     /not open yet/,
   );
   // safezone → tables, flag, and router branch gone
-  await down(downs[1]);
+  await downNamed("_safezone");
   for (const t of [
     "public.town_halls",
     "public.town_hall_votes",
@@ -67,10 +71,10 @@ test("stepwise rollback leaves a working schema at every stage", async () => {
     /Unknown command/,
   );
   // quickzone scoring → triggers removed; QuickZone still scores base points
-  await down(downs[2]);
+  await downNamed("_quickzone_scoring");
   assert.equal(await fn("private.quick_bonus()"), false);
   // family controls → original router; data-rights commands no longer exist
-  await down(downs[3]);
+  await downNamed("_family_controls");
   await assert.rejects(() => h.cmd(G, "export", {}), /Unknown command/);
   // The pilot itself still works, with the data created before rollback intact.
   await h.cmd(G, "child", {
@@ -106,6 +110,7 @@ test("roll forward re-applies cleanly and every feature works again", async () =
   );
   await h.as(G, "select public.qz_rate('export')");
   assert.equal(await fn("private.quick_bonus()"), true);
+  assert.equal(await fn("public.qz_flags()"), true);
 });
 
 test("a second full down/up cycle is repeatable", async () => {

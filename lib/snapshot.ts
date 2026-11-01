@@ -14,6 +14,8 @@ export async function snapshot(): Promise<Snapshot> {
     );
   const { data: staff, error: staffError } = await db.rpc("qz_is_staff");
   if (staffError) throw new Error("The QuiZone database is not ready.");
+  // Operator kill switches; a missing map means "all on" for older databases.
+  const { data: flags } = await db.rpc("qz_flags");
   const hid = h.data?.id;
   const results = await Promise.all([
     db.from("challenges").select("*,versions:challenge_versions(*)"),
@@ -90,6 +92,7 @@ export async function snapshot(): Promise<Snapshot> {
     schedules: hid ? rows[7] : [],
     qLogs: hid ? rows[8] : [],
     admin: Boolean(staff),
+    flags: (flags as Record<string, boolean> | null) ?? {},
     cases: staff ? rows[rows.length - 1] : [],
   } as Snapshot;
 }

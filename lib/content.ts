@@ -116,3 +116,8 @@ export const safezone = {
     technical: "Something isn’t working",
   } as Record<string, string>,
 };
+// A zone is open unless an operator has explicitly paused it.
+export const zoneOpen = (
+  flags: Record<string, boolean> | undefined,
+  mode: string,
+) => flags?.["zone_" + mode] !== false;
