@@ -379,3 +379,31 @@ test("QZ-22: literal-message quality checks report instead of erroring (WorldZon
     JSON.stringify(issues),
   );
 });
+
+test("QZ-23: publishing is refused while quality issues remain, then allowed once fixed", async () => {
+  const build = await challenge("build");
+  const draft = (await versions(build)).find((v) => v.status === "draft")!;
+  await assert.rejects(
+    () => h.cmd(ADMIN, "publish", { version: draft.id, ageReviewed: true }),
+    /Quality check failed: .*duplicate options/,
+  );
+  // A direct status update (bypassing the command) hits the same gate.
+  await assert.rejects(
+    () =>
+      h.db.query(
+        "update public.challenge_versions set status='published' where id=$1",
+        [draft.id],
+      ),
+    /Quality check failed/,
+  );
+  const bad = (await cms(draft.id)).steps.find((s: { options: string[] }) =>
+    s.options.includes("Same"),
+  );
+  await h.cmd(ADMIN, "cms_step_update", { step: bad.id, ...step() });
+  assert.deepEqual((await cms(draft.id)).issues, []);
+  await h.cmd(ADMIN, "publish", { version: draft.id, ageReviewed: true });
+  assert.deepEqual(
+    (await versions(build)).map((v) => v.status),
+    ["retired", "published"],
+  );
+});

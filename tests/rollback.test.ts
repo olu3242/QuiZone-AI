@@ -47,6 +47,8 @@ test("every post-pilot migration has a matching down script", () => {
 
 // Checks that must hold right after each named migration is rolled back.
 const afterDown: Record<string, () => Promise<void>> = {
+  _quality_gate: async () =>
+    assert.equal(await fn("private.quality_gate()"), false),
   _cms_authoring: async () =>
     assert.equal(await fn("public.qz_cms_version(uuid)"), false),
   _content_meta: async () => {
