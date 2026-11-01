@@ -1,4 +1,5 @@
 "use client";
+import { levelFor } from "@/lib/progress";
 import {
   ArrowRight,
   Compass,
@@ -159,10 +160,14 @@ export function HomePage() {
                   <div>
                     <strong>{c.nickname}</strong>
                     <small>
-                      {data.scores
-                        .filter((s) => s.child_id === c.id)
-                        .reduce((a, s) => a + s.points, 0)}{" "}
-                      XP · Family explorer
+                      {(() => {
+                        const lv = levelFor(
+                          data.scores
+                            .filter((s) => s.child_id === c.id)
+                            .reduce((a, s) => a + s.points, 0),
+                        );
+                        return `${lv.xp} XP · ${lv.name}`;
+                      })()}
                     </small>
                   </div>
                 </div>

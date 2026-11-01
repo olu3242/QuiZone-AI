@@ -142,7 +142,27 @@ export async function GET() {
         .eq("household_id", hid)
         .order("created_at"),
     ]);
-    if ([szRegs, szSaid, szVotes, szReports, szNotes].some((p) => p.error))
+    const [childBadges, familyBadges] = await Promise.all([
+      db
+        .from("child_badges")
+        .select("child_id,badge_code,awarded_at")
+        .in("child_id", kidIds),
+      db
+        .from("household_badges")
+        .select("badge_code,awarded_at")
+        .eq("household_id", hid),
+    ]);
+    if (
+      [
+        szRegs,
+        szSaid,
+        szVotes,
+        szReports,
+        szNotes,
+        childBadges,
+        familyBadges,
+      ].some((p) => p.error)
+    )
       return fail("Could not prepare your export.");
     const body = {
       exportedAt: new Date().toISOString(),
@@ -161,6 +181,7 @@ export async function GET() {
       scheduledGameNights: nights.data,
       guidedHints: hints.data,
       auditTrail: events.data,
+      badges: { children: childBadges.data, family: familyBadges.data },
       safezone: {
         townHallRegistrations: szRegs.data,
         contributions: szSaid.data,

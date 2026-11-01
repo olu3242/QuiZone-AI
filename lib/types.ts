@@ -72,6 +72,15 @@ export type Snapshot = {
   qLogs: { id: string; output: string; created_at: string }[];
   admin: boolean;
   flags: Record<string, boolean>;
+  badges: {
+    code: string;
+    scope: string;
+    name: string;
+    description: string;
+    sort: number;
+  }[];
+  childBadges: { child_id: string; badge_code: string; awarded_at: string }[];
+  familyBadges: { badge_code: string; awarded_at: string }[];
   cases: { id: string; reason: string; status: string; created_at: string }[];
 };
 

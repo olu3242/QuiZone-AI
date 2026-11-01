@@ -3791,3 +3791,32 @@ input[type="radio"] {
   font-weight: 700;
   font-size: 13px;
 }
+
+/* QZ-24 badges */
+.badge-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.badge-list li {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.badge-list li.earned {
+  background: #fff4d2;
+  border-color: #f2c94c;
+  color: #6b4a00;
+}
+.badge-list li.locked {
+  color: #4b5262;
+  background: #f5f7fc;
+}
+.badge-list.family {
+  margin-bottom: 26px;
+}
