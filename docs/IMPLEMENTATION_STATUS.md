@@ -1,5 +1,7 @@
 # QuiZone implementation status — October 18, 2026
 
+> Superseded by `QUIZONE_CURRENT_STATE.md` (2026-11-01). Kept as the Oct 18 record.
+
 **Decision: shared-screen pilot implemented locally; hosted E2E NOT CERTIFIED; production NO-GO.**
 
 Base commit `ef9ab4e` contained only configuration and documentation. This branch restores the application and database implementation. The historical local W13 report referenced in earlier project conversations was not available in this checkout; no claim is made that this branch incorporates that unpublished work.
