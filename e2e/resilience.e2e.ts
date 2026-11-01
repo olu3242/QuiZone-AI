@@ -81,16 +81,23 @@ test("2. dropped polls show a reconnect state and recover without losing the ses
 });
 
 test("3. a failed write (503) is surfaced, nothing is saved, and retry succeeds exactly once", async () => {
-  await page.route(
-    "**/api/command",
-    (r) =>
-      r.fulfill({
+  // Fail only the answer write: the page also sends presence heartbeats through
+  // /api/command, and those must not consume the injected failure.
+  let injected = false;
+  await page.route("**/api/command", (r) => {
+    if (
+      !injected &&
+      (r.request().postData() || "").includes('"action":"answer"')
+    ) {
+      injected = true;
+      return r.fulfill({
         status: 503,
         contentType: "application/json",
         body: JSON.stringify({ error: "Service temporarily unavailable." }),
-      }),
-    { times: 1 },
-  );
+      });
+    }
+    return r.continue();
+  });
   await page.locator(".answer-options label").first().click();
   await page.getByRole("button", { name: /Lock in our answer/ }).click();
   await page.getByText("Service temporarily unavailable.").waitFor();
@@ -99,12 +106,19 @@ test("3. a failed write (503) is surfaced, nothing is saved, and retry succeeds 
     0,
     "the injected failure never reached the server",
   );
+  // Wait for the retried write itself to succeed before reading saved state.
+  const retried = page.waitForResponse(
+    (r) =>
+      r.url().includes("/api/command") &&
+      (r.request().postData() || "").includes('"action":"answer"'),
+  );
   await page.getByRole("button", { name: /Lock in our answer/ }).click();
+  assert.equal((await retried).status(), 200);
+  await page.unroute("**/api/command");
   await page.waitForFunction(
     () =>
       !document.body.textContent?.includes("Service temporarily unavailable."),
   );
-  await page.locator(".answer-history, .answer-options").first().waitFor();
   const s = await saved();
   assert.equal(s.answers.length, 1);
 });
@@ -114,15 +128,20 @@ test("4. a lost response after the server saved is safe to retry: no duplicate a
   const step = before.steps.find(
     (st) => !before.answers.some((a) => a.step_id === st.id),
   )!;
-  // Let the request reach the server, then drop the response on the floor.
-  await page.route(
-    "**/api/command",
-    async (r) => {
+  // Let the answer reach the server, then drop its response on the floor. Only the
+  // answer: presence heartbeats share /api/command and must pass through.
+  let dropped = false;
+  await page.route("**/api/command", async (r) => {
+    if (
+      !dropped &&
+      (r.request().postData() || "").includes('"action":"answer"')
+    ) {
+      dropped = true;
       await r.fetch();
-      await r.abort("connectionreset");
-    },
-    { times: 1 },
-  );
+      return r.abort("connectionreset");
+    }
+    return r.continue();
+  });
   const first = await page.evaluate(
     async (body) => {
       try {
@@ -139,6 +158,7 @@ test("4. a lost response after the server saved is safe to retry: no duplicate a
     { action: "answer", data: { session, step: step.id, choice: 0 } },
   );
   assert.equal(first, "lost");
+  await page.unroute("**/api/command");
   const afterLost = await saved();
   assert.equal(
     afterLost.answers.length,
