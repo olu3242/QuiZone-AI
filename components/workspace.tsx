@@ -83,6 +83,7 @@ export function Workspace({
   const member = data?.household?.role === "member";
   // Explorer mode: only play areas are offered (the server refuses the rest).
   const locked = Boolean(data?.locked);
+  const unread = (data?.notifications ?? []).filter((n) => !n.read_at).length;
   const nav = (
     [
       ["/home", "Home", Home],
@@ -129,6 +130,11 @@ export function Workspace({
                 className={path === "/parent" ? "selected" : ""}
               >
                 <ShieldCheck size={20} /> Parent Hub
+                {unread > 0 && (
+                  <span className="nav-badge" aria-label={`${unread} new`}>
+                    {unread}
+                  </span>
+                )}
               </Link>
             )}
             {data?.admin && !locked && (

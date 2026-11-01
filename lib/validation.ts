@@ -232,6 +232,19 @@ export const actionSchema = z.discriminatedUnion("action", [
     }),
   }),
   z.object({
+    action: z.literal("cms_country"),
+    data: z.object({
+      challenge: z.string().uuid(),
+      country: z
+        .string()
+        .trim()
+        .regex(
+          /^[A-Za-z][A-Za-z .'-]{1,55}$/,
+          "Enter a country name (letters only).",
+        ),
+    }),
+  }),
+  z.object({
     action: z.literal("cms_step_add"),
     data: z
       .object({
@@ -303,6 +316,13 @@ export const actionSchema = z.discriminatedUnion("action", [
   }),
   z.object({ action: z.literal("member_leave"), data: z.object({}) }),
   z.object({ action: z.literal("explorer_lock"), data: z.object({}) }),
+  z.object({
+    action: z.literal("notice_read"),
+    data: z.union([
+      z.object({ id: z.string().uuid() }),
+      z.object({ all: z.literal(true) }),
+    ]),
+  }),
   z.object({
     action: z.literal("presence"),
     data: z.object({ session: z.string().uuid() }),
@@ -443,6 +463,7 @@ export const safezoneConsentSchema = z.discriminatedUnion("action", [
 ]);
 export const adminActions = [
   "cms_meta",
+  "cms_country",
   "cms_step_add",
   "cms_step_update",
   "cms_step_delete",
@@ -474,6 +495,7 @@ export const guardianOnlyActions = [
   "member_invite",
   "member_uninvite",
   "member_remove",
+  "notice_read",
 ] as const;
 export const moderatorActions = [
   "sz_hall_create",

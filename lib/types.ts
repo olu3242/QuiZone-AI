@@ -86,6 +86,24 @@ export type Snapshot = {
   qLogs: { id: string; output: string; created_at: string }[];
   admin: boolean;
   locked: boolean;
+  notifications: {
+    id: string;
+    kind: string;
+    title: string;
+    body: string;
+    link: string | null;
+    created_at: string;
+    read_at: string | null;
+  }[];
+  builds: {
+    session_id: string;
+    roof: boolean;
+    access: boolean;
+    seating: boolean;
+    lighting: boolean;
+    mural: boolean;
+    total_cost: number;
+  }[];
   flags: Record<string, boolean>;
   consent: {
     current: number;

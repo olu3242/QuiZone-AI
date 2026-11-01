@@ -407,3 +407,57 @@ test("QZ-23: publishing is refused while quality issues remain, then allowed onc
     ["retired", "published"],
   );
 });
+
+test("QZ-38: admins set a WorldZone country so CMS-authored WorldZone challenges can publish", async () => {
+  const { harness } = await import("./support/db");
+  const A = "a9111111-1111-4111-8111-111111111111",
+    G = "a9222222-2222-4222-8222-222222222222";
+  const h = await harness([
+    [A, true],
+    [G, true],
+  ]);
+  try {
+    await h.db.query(
+      "insert into private.staff(user_id,role) values($1,'admin')",
+      [A],
+    );
+    await h.cmd(A, "draft", {
+      title: "Rivers of the world",
+      mode: "world",
+      scenario: "Explore how a great river shapes the towns along its banks.",
+      prompt: "What does a river give the towns along it?",
+      options: ["Water and travel", "Nothing at all"],
+      correct: 0,
+      hint: "Think about boats and drinking water.",
+      explanation: "Rivers carry water, food, and people.",
+    });
+    const c = await h.one<{ id: string; v: string }>(
+      "select c.id, v.id v from public.challenges c join public.challenge_versions v on v.challenge_id=c.id where c.title='Rivers of the world'",
+    );
+    await assert.rejects(
+      () => h.cmd(A, "publish", { version: c.v, ageReviewed: true }),
+      /need a country/,
+    );
+    await assert.rejects(
+      () => h.cmd(G, "cms_country", { challenge: c.id, country: "Egypt" }),
+      /administrator/,
+    );
+    await assert.rejects(
+      () => h.cmd(A, "cms_country", { challenge: c.id, country: "<b>x</b>" }),
+      /country name/,
+    );
+    await h.cmd(A, "cms_country", { challenge: c.id, country: "Egypt" });
+    await h.cmd(A, "publish", { version: c.v, ageReviewed: true });
+    const quick = (
+      await h.one<{ id: string }>(
+        "select id from public.challenges where mode='quick' limit 1",
+      )
+    ).id;
+    await assert.rejects(
+      () => h.cmd(A, "cms_country", { challenge: quick, country: "Egypt" }),
+      /WorldZone challenge not found/,
+    );
+  } finally {
+    await h.db.close();
+  }
+});

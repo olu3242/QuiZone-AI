@@ -148,21 +148,33 @@ export async function GET() {
         .eq("household_id", hid)
         .order("created_at"),
     ]);
-    const [consents, childBadges, familyBadges] = await Promise.all([
-      db
-        .from("consent_records")
-        .select("version,accepted_at")
-        .eq("household_id", hid)
-        .order("version"),
-      db
-        .from("child_badges")
-        .select("child_id,badge_code,awarded_at")
-        .in("child_id", kidIds),
-      db
-        .from("household_badges")
-        .select("badge_code,awarded_at")
-        .eq("household_id", hid),
-    ]);
+    // Order matters: destructuring is positional (an earlier bug mixed these up).
+    const [consents, childBadges, familyBadges, members, notices] =
+      await Promise.all([
+        db
+          .from("consent_records")
+          .select("version,accepted_at")
+          .eq("household_id", hid)
+          .order("version"),
+        db
+          .from("child_badges")
+          .select("child_id,badge_code,awarded_at")
+          .in("child_id", kidIds),
+        db
+          .from("household_badges")
+          .select("badge_code,awarded_at")
+          .eq("household_id", hid),
+        db
+          .from("household_members")
+          .select("display_name,joined_at")
+          .eq("household_id", hid)
+          .order("joined_at"),
+        db
+          .from("family_notifications")
+          .select("kind,title,body,created_at,read_at")
+          .eq("household_id", hid)
+          .order("created_at"),
+      ]);
     if (
       [
         szRegs,
@@ -173,6 +185,8 @@ export async function GET() {
         childBadges,
         familyBadges,
         consents,
+        members,
+        notices,
       ].some((p) => p.error)
     )
       return fail("Could not prepare your export.");
@@ -195,6 +209,8 @@ export async function GET() {
       auditTrail: events.data,
       badges: { children: childBadges.data, family: familyBadges.data },
       consentRecords: consents.data,
+      familyMembers: members.data,
+      familyInbox: notices.data,
       safezone: {
         townHallRegistrations: szRegs.data,
         contributions: szSaid.data,

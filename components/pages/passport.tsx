@@ -1,4 +1,5 @@
 "use client";
+import { BuildPortfolio } from "../build-portfolio";
 import { levelFor } from "@/lib/progress";
 import { ArrowRight, Globe2 } from "lucide-react";
 import Link from "next/link";
@@ -62,6 +63,7 @@ export function PassportPage() {
           ))}
         </div>
       )}
+      <BuildPortfolio data={data} />
       <div className="mini-heading">
         <h2>Family badges</h2>
       </div>

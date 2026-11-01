@@ -1,4 +1,5 @@
 "use client";
+import { FamilyInbox } from "../family-inbox";
 import { ExplorerLocked } from "../explorer-mode";
 import { GuardianOnly } from "../family-members";
 import { zones } from "@/lib/content";
@@ -101,6 +102,7 @@ export function ParentPage() {
           <Settings2 size={16} /> Family preferences
         </Link>
       </Heading>
+      <FamilyInbox data={data} />
       <div className="stats-row">
         <div>
           <ShieldCheck />

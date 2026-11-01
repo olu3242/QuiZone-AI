@@ -142,3 +142,27 @@ export const practiceCopy = {
   result:
     "Practice round complete. Nothing was added to XP, badges, or stamps.",
 };
+
+// QZ-35: labels for maintenance run counts (admin panel).
+export const maintenanceLabels: Record<string, string> = {
+  expiredSessions: "games expired",
+  rateEvents: "rate records cleared",
+  invites: "old invites cleared",
+  locks: "old locks cleared",
+  devices: "device records cleared",
+  reminders: "reminders sent",
+};
+
+// QZ-37: BuildZone portfolio copy.
+export const portfolioCopy = {
+  title: "Our designs",
+  empty:
+    "Designs you save in BuildZone appear here, with what they cost and what you chose.",
+  parts: {
+    roof: "Rain cover",
+    access: "Step-free path",
+    seating: "Comfortable seats",
+    lighting: "Solar lighting",
+    mural: "Community mural",
+  },
+} as const;

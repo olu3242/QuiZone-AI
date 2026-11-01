@@ -4143,3 +4143,83 @@ input[type="radio"] {
   margin: -4px 0 12px;
   font-size: 12px;
 }
+/* QZ-35–37: maintenance, family inbox, build portfolio */
+.maintenance-panel,
+.family-inbox {
+  margin: 24px 0;
+}
+.family-inbox h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.maintenance-runs,
+.inbox-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+}
+.maintenance-runs li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.inbox-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.inbox-list li.unread {
+  border-color: #b9aef5;
+  background: #f7f5ff;
+}
+.inbox-list p {
+  font-size: 13px;
+  margin: 4px 0;
+  color: #3f4656;
+}
+.inbox-list small {
+  color: #4b5262;
+}
+.inbox-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.portfolio-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.portfolio-grid > li {
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.portfolio-cost {
+  font-weight: 800;
+  font-size: 18px;
+}
+.portfolio-parts {
+  list-style: none;
+  padding: 0;
+  font-size: 13px;
+  display: grid;
+  gap: 2px;
+}
+.portfolio-parts .skipped {
+  color: #4b5262;
+}

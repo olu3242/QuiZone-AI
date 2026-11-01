@@ -6,8 +6,8 @@
 | ---------------------------------------------- | -------------------------- | --------------- | --------------- | ---------------- | ------------------------------------------------ | ----------------- | --------------- | -------------------- |
 | Guardian identity (one account)                | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 | Shared child profile                           | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
-| Archived explorers excluded                    | ✅                         | ◐               | ◐               | ◐                | ✅                                               | ✅                | ◐               | —                    |
-| Age eligibility (server)                       | ✅                         | ◐               | ◐               | ◐                | ✅                                               | ✅                | ◐               | —                    |
+| Archived explorers excluded                    | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | —                    |
+| Age eligibility (server)                       | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | —                    |
 | Guardian permission gate                       | —                          | —               | —               | —                | ✅                                               | —                 | ✅              | ✅                   |
 | Household isolation (RLS + API)                | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 | Server-authoritative scoring                   | ✅                         | ✅ (budget)     | ✅ (cost)       | ✅               | —                                                | ✅                | ✅              | —                    |
@@ -19,11 +19,11 @@
 | Data export (v2)                               | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 | Cascade deletion                               | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 | Operator feature flag                          | ✅ `zone_quick`            | ✅ `zone_solve` | ✅ `zone_build` | ✅ `zone_debate` | ✅ `safezone` (off)                              | ✅ via zone flags | ✅ `zone_world` | ✅ `q_hints`         |
-| Content via CMS (draft → age review → publish) | ✅                         | ◐               | ◐               | ◐                | own console                                      | —                 | ◐               | —                    |
+| Content via CMS (draft → age review → publish) | ✅                         | ✅              | ✅              | ✅               | own console                                      | —                 | ✅              | —                    |
 | Accessibility (axe AA, 390 + desktop)          | ✅                         | ✅              | ✅              | ✅               | ✅                                               | ✅                | ✅              | ✅                   |
 
 "Server-authoritative" means the client can't change an outcome. SolveZone overspend and BuildZone over-budget designs are refused by the server even when the UI is bypassed (E2E zones 1–2).
 
-## Remaining ◐ (DB-tested, no browser journey)
+## Remaining ◐
 
-Archived-explorer and age-band refusals for the non-Quick zones use the same server path that the QuickZone and SafeZone browser tests already cover. A CMS-authored Solve/Build/Debate/World challenge would need multi-step CMS editing (QZ-07) before it can be authored in the UI.
+None. QZ-38 (`e2e/automation` A1–A2) covers CMS authoring in every non-Quick zone and the server's age-band and archived-explorer refusals in each. Full traceability: `QUIZONE_SCENARIOS.md`.

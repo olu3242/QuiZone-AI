@@ -1,4 +1,5 @@
 "use client";
+import { MaintenancePanel } from "../maintenance-panel";
 import { ExplorerLocked } from "../explorer-mode";
 import { difficulties, subjects, zones } from "@/lib/content";
 import type { AppAction } from "@/lib/validation";
@@ -44,6 +45,7 @@ export function AdminPage() {
       />
       <Feedback message={message} />
       <OpsOverview />
+      <MaintenancePanel />
       <div className="content-split">
         <section>
           <h2>Challenge library</h2>
@@ -87,6 +89,32 @@ export function AdminPage() {
                   Save details
                 </button>
               </form>
+              {c.mode === "world" && (
+                <form
+                  className="meta-editor"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void execute("cms_country", {
+                      challenge: c.id,
+                      country: new FormData(e.currentTarget).get("country"),
+                    });
+                  }}
+                >
+                  <label>
+                    Country (passport stamp)
+                    <input
+                      name="country"
+                      required
+                      maxLength={56}
+                      defaultValue={c.country ?? ""}
+                      placeholder="Kenya"
+                    />
+                  </label>
+                  <button className="btn small secondary" disabled={busy}>
+                    Save country
+                  </button>
+                </form>
+              )}
               {c.versions.map((v) => (
                 <div className="session-row" key={v.id}>
                   <span>

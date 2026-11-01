@@ -97,7 +97,7 @@ export async function snapshot(): Promise<Snapshot> {
       : Promise.resolve({ data: [], error: null }),
   ]);
   // Household adults: everyone sees who's in the family; only the guardian sees invites.
-  const [members, invites] = await Promise.all([
+  const [members, invites, notices, builds] = await Promise.all([
     hid
       ? db
           .from("household_members")
@@ -115,19 +115,43 @@ export async function snapshot(): Promise<Snapshot> {
           .gt("expires_at", new Date().toISOString())
           .order("created_at")
       : Promise.resolve({ data: [], error: null }),
+    // Family inbox: guardian only (RLS also hides it from members and locked sessions).
+    hid && isGuardian
+      ? db
+          .from("family_notifications")
+          .select("id,kind,title,body,link,created_at,read_at")
+          .eq("household_id", hid)
+          .order("created_at", { ascending: false })
+          .limit(30)
+      : Promise.resolve({ data: [], error: null }),
+    // BuildZone portfolio: saved designs from this household's sessions.
+    hid
+      ? db
+          .from("build_submissions")
+          .select(
+            "session_id,roof,access,seating,lighting,mural,total_cost,game_sessions!inner(household_id)",
+          )
+          .eq("game_sessions.household_id", hid)
+      : Promise.resolve({ data: [], error: null }),
   ]);
   if (
     catalog.error ||
     earned.error ||
     family.error ||
     members.error ||
-    invites.error
+    invites.error ||
+    notices.error ||
+    builds.error
   )
     throw new Error("Could not load family data. Please try again.");
   return {
     household: h.data,
     members: members.data ?? [],
     invites: invites.data ?? [],
+    notifications: notices.data ?? [],
+    builds: (builds.data ?? []).map(
+      ({ game_sessions: _, ...b }: Record<string, unknown>) => b,
+    ),
     children: hid ? rows[1] : [],
     permissions: hid ? rows[2] : null,
     challenges: rows[0],

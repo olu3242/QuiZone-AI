@@ -44,8 +44,20 @@ All journeys use one guardian account and shared child profiles. **E2E** refers 
 | 2    | Review game safety reports with an audited history            | DB-VERIFIED | DB database   |
 | 3    | Assign SafeZone moderators                                    | DB-VERIFIED | DB safezone 2 |
 
+## Added in QZ-31–38
+
+| Journey                                                                                                                                        | Evidence                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Family member: join with a guardian's code → host and play on their own device → see live state from another device → lose access when removed | E2E members M1–M5                     |
+| Explorer mode: an adult locks the shared screen → explorer dashboard → play only → adult unlocks with a password                               | E2E explorer X1–X5                    |
+| Global Connect: after WorldZone, see how other families answered (aggregates, k ≥ 5)                                                           | E2E global G1–G3                      |
+| Guardian: family inbox (badges, report reviews, members, consent updates, game-night reminders), mark read                                     | E2E automation A3–A4                  |
+| Explorer: "Our designs" portfolio in the Passport                                                                                              | E2E automation A5                     |
+| Admin: author challenges in every zone (incl. WorldZone country), run maintenance, review Q suggestions                                        | E2E automation A1, A4; platform QZ-34 |
+
+Every journey step maps to automated evidence in `QUIZONE_SCENARIOS.md` (validated by `tests/scenarios.test.ts`).
+
 ## Not yet available
 
-- Family member (non-guardian adult) invitations and multi-device play (QZ-05)
-- Child sign-in / child dashboard (decision in `QUIZONE_MASTER_ARCHITECTURE.md`)
 - Educator journeys (post-MVP per PRD)
+- Live child-facing Q (needs a trusted server-side writer and a safeguarding review)

@@ -1,0 +1,980 @@
+{
+  "$comment": "QZ-38 scenario catalog. Validated by tests/scenarios.test.ts: every citation must exist, and every browser test must be cited.",
+  "scenarios": [
+    {
+      "id": "automation:001",
+      "role": "admin / guardian",
+      "scenario": "A1. CMS authors a 13–17 challenge in every non-Quick zone; age bands hold in each",
+      "browser": [
+        "e2e/automation.e2e.ts#A1. CMS authors a 13–17 challenge in every non-Quick zone; age bands hold in each"
+      ],
+      "db": [
+        "tests/ops-automation.test.ts",
+        "tests/family-notifications.test.ts",
+        "tests/content.test.ts"
+      ]
+    },
+    {
+      "id": "automation:002",
+      "role": "admin / guardian",
+      "scenario": "A2. archived explorers are refused in every zone; active ones can play a CMS challenge end to end",
+      "browser": [
+        "e2e/automation.e2e.ts#A2. archived explorers are refused in every zone; active ones can play a CMS challenge end to end"
+      ],
+      "db": [
+        "tests/ops-automation.test.ts",
+        "tests/family-notifications.test.ts",
+        "tests/content.test.ts"
+      ]
+    },
+    {
+      "id": "automation:003",
+      "role": "admin / guardian",
+      "scenario": "A3. the family inbox shows earned badges and report reviews; read state persists",
+      "browser": [
+        "e2e/automation.e2e.ts#A3. the family inbox shows earned badges and report reviews; read state persists"
+      ],
+      "db": [
+        "tests/ops-automation.test.ts",
+        "tests/family-notifications.test.ts",
+        "tests/content.test.ts"
+      ]
+    },
+    {
+      "id": "automation:004",
+      "role": "admin / guardian",
+      "scenario": "A4. scheduled maintenance: admin runs it; stale games expire; reminders reach the inbox once",
+      "browser": [
+        "e2e/automation.e2e.ts#A4. scheduled maintenance: admin runs it; stale games expire; reminders reach the inbox once"
+      ],
+      "db": [
+        "tests/ops-automation.test.ts",
+        "tests/family-notifications.test.ts",
+        "tests/content.test.ts"
+      ]
+    },
+    {
+      "id": "automation:005",
+      "role": "admin / guardian",
+      "scenario": "A5. the BuildZone portfolio shows the family's saved design",
+      "browser": [
+        "e2e/automation.e2e.ts#A5. the BuildZone portfolio shows the family's saved design"
+      ],
+      "db": [
+        "tests/ops-automation.test.ts",
+        "tests/family-notifications.test.ts",
+        "tests/content.test.ts"
+      ]
+    },
+    {
+      "id": "automation:006",
+      "role": "admin / guardian",
+      "scenario": "A6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface",
+      "browser": [
+        "e2e/automation.e2e.ts#A6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface"
+      ],
+      "db": []
+    },
+    {
+      "id": "automation:007",
+      "role": "admin / guardian",
+      "scenario": "A7. no uncaught client console errors",
+      "browser": [
+        "e2e/automation.e2e.ts#A7. no uncaught client console errors"
+      ],
+      "db": []
+    },
+    {
+      "id": "explorer:008",
+      "role": "explorer",
+      "scenario": "X1. an adult turns on Explorer mode; explorers get their own dashboard",
+      "browser": [
+        "e2e/explorer.e2e.ts#X1. an adult turns on Explorer mode; explorers get their own dashboard"
+      ],
+      "db": ["tests/explorer-mode.test.ts"]
+    },
+    {
+      "id": "explorer:009",
+      "role": "explorer",
+      "scenario": "X2. guardian areas are closed in the UI, the app API, and Supabase directly",
+      "browser": [
+        "e2e/explorer.e2e.ts#X2. guardian areas are closed in the UI, the app API, and Supabase directly"
+      ],
+      "db": ["tests/explorer-mode.test.ts"]
+    },
+    {
+      "id": "explorer:010",
+      "role": "explorer",
+      "scenario": "X3. play works while locked, start to finish",
+      "browser": [
+        "e2e/explorer.e2e.ts#X3. play works while locked, start to finish"
+      ],
+      "db": ["tests/explorer-mode.test.ts"]
+    },
+    {
+      "id": "explorer:011",
+      "role": "explorer",
+      "scenario": "X4. the lock survives reloads and new tabs (it isn't client state)",
+      "browser": [
+        "e2e/explorer.e2e.ts#X4. the lock survives reloads and new tabs (it isn't client state)"
+      ],
+      "db": ["tests/explorer-mode.test.ts"]
+    },
+    {
+      "id": "explorer:012",
+      "role": "explorer",
+      "scenario": "X5. the grown-up unlocks with their password; everything returns",
+      "browser": [
+        "e2e/explorer.e2e.ts#X5. the grown-up unlocks with their password; everything returns"
+      ],
+      "db": ["tests/explorer-mode.test.ts"]
+    },
+    {
+      "id": "explorer:013",
+      "role": "explorer",
+      "scenario": "X6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface",
+      "browser": [
+        "e2e/explorer.e2e.ts#X6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface"
+      ],
+      "db": []
+    },
+    {
+      "id": "explorer:014",
+      "role": "explorer",
+      "scenario": "X7. no uncaught client console errors",
+      "browser": ["e2e/explorer.e2e.ts#X7. no uncaught client console errors"],
+      "db": []
+    },
+    {
+      "id": "family-journey:015",
+      "role": "guardian",
+      "scenario": "1. public landing, auth routes, and health respond without dead links",
+      "browser": [
+        "e2e/family-journey.e2e.ts#1. public landing, auth routes, and health respond without dead links"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:016",
+      "role": "guardian",
+      "scenario": "2. guardian signup requires email confirmation before login",
+      "browser": [
+        "e2e/family-journey.e2e.ts#2. guardian signup requires email confirmation before login"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:017",
+      "role": "guardian",
+      "scenario": "3. household, explorers, and permissions persist across reload",
+      "browser": [
+        "e2e/family-journey.e2e.ts#3. household, explorers, and permissions persist across reload"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:018",
+      "role": "guardian",
+      "scenario": "4. explorer edit, archive excludes from play, restore returns",
+      "browser": [
+        "e2e/family-journey.e2e.ts#4. explorer edit, archive excludes from play, restore returns"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:019",
+      "role": "guardian",
+      "scenario": "5. QuickZone game night: lobby → active → answers → persisted results",
+      "browser": [
+        "e2e/family-journey.e2e.ts#5. QuickZone game night: lobby → active → answers → persisted results"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:020",
+      "role": "guardian",
+      "scenario": "5b. QuickZone bonuses are server-scored and Play again opens a new lobby",
+      "browser": [
+        "e2e/family-journey.e2e.ts#5b. QuickZone bonuses are server-scored and Play again opens a new lobby"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:021",
+      "role": "guardian",
+      "scenario": "6. client-supplied scores and replays are rejected by the server",
+      "browser": [
+        "e2e/family-journey.e2e.ts#6. client-supplied scores and replays are rejected by the server"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:022",
+      "role": "guardian",
+      "scenario": "7. Parent Hub reflects real recorded activity",
+      "browser": [
+        "e2e/family-journey.e2e.ts#7. Parent Hub reflects real recorded activity"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:023",
+      "role": "guardian",
+      "scenario": "8. cross-family isolation via app API and direct Supabase REST",
+      "browser": [
+        "e2e/family-journey.e2e.ts#8. cross-family isolation via app API and direct Supabase REST"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:024",
+      "role": "guardian",
+      "scenario": "9. guardian data export is complete and scoped",
+      "browser": [
+        "e2e/family-journey.e2e.ts#9. guardian data export is complete and scoped"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:025",
+      "role": "guardian",
+      "scenario": "10. responsive layouts at 390 / 1024 / 1440 without horizontal scroll",
+      "browser": [
+        "e2e/family-journey.e2e.ts#10. responsive layouts at 390 / 1024 / 1440 without horizontal scroll"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:026",
+      "role": "guardian",
+      "scenario": "11. accessibility: no critical/serious WCAG 2.2 AA violations on key pages",
+      "browser": [
+        "e2e/family-journey.e2e.ts#11. accessibility: no critical/serious WCAG 2.2 AA violations on key pages"
+      ],
+      "db": []
+    },
+    {
+      "id": "family-journey:027",
+      "role": "guardian",
+      "scenario": "12. keyboard: skip to content and focusable primary navigation",
+      "browser": [
+        "e2e/family-journey.e2e.ts#12. keyboard: skip to content and focusable primary navigation"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:028",
+      "role": "guardian",
+      "scenario": "13. password change re-verifies, then old password stops working",
+      "browser": [
+        "e2e/family-journey.e2e.ts#13. password change re-verifies, then old password stops working"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:029",
+      "role": "guardian",
+      "scenario": "14. password recovery by email resets the password",
+      "browser": [
+        "e2e/family-journey.e2e.ts#14. password recovery by email resets the password"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:030",
+      "role": "guardian",
+      "scenario": "15. account deletion erases the household and the sign-in",
+      "browser": [
+        "e2e/family-journey.e2e.ts#15. account deletion erases the household and the sign-in"
+      ],
+      "db": ["tests/family-controls.test.ts"]
+    },
+    {
+      "id": "family-journey:031",
+      "role": "guardian",
+      "scenario": "16. no uncaught client console errors during the journey",
+      "browser": [
+        "e2e/family-journey.e2e.ts#16. no uncaught client console errors during the journey"
+      ],
+      "db": []
+    },
+    {
+      "id": "global:032",
+      "role": "explorer",
+      "scenario": "G1. after WorldZone, the family sees aggregate answers from other families",
+      "browser": [
+        "e2e/global.e2e.ts#G1. after WorldZone, the family sees aggregate answers from other families"
+      ],
+      "db": ["tests/global-connect.test.ts"]
+    },
+    {
+      "id": "global:033",
+      "role": "explorer",
+      "scenario": "G2. nothing identifies another family, on the page or in the API",
+      "browser": [
+        "e2e/global.e2e.ts#G2. nothing identifies another family, on the page or in the API"
+      ],
+      "db": ["tests/global-connect.test.ts"]
+    },
+    {
+      "id": "global:034",
+      "role": "explorer",
+      "scenario": "G3. the operator kill switch hides comparisons",
+      "browser": [
+        "e2e/global.e2e.ts#G3. the operator kill switch hides comparisons"
+      ],
+      "db": ["tests/global-connect.test.ts"]
+    },
+    {
+      "id": "global:035",
+      "role": "explorer",
+      "scenario": "G4. accessibility (axe WCAG 2.2 AA) and no overflow",
+      "browser": [
+        "e2e/global.e2e.ts#G4. accessibility (axe WCAG 2.2 AA) and no overflow"
+      ],
+      "db": []
+    },
+    {
+      "id": "global:036",
+      "role": "explorer",
+      "scenario": "G5. no uncaught client console errors",
+      "browser": ["e2e/global.e2e.ts#G5. no uncaught client console errors"],
+      "db": []
+    },
+    {
+      "id": "members:037",
+      "role": "family member",
+      "scenario": "M1. guardian creates a single-use invite code, shown once",
+      "browser": [
+        "e2e/members.e2e.ts#M1. guardian creates a single-use invite code, shown once"
+      ],
+      "db": ["tests/family-members.test.ts"]
+    },
+    {
+      "id": "members:038",
+      "role": "family member",
+      "scenario": "M2. an adult joins with the code; a wrong code is refused",
+      "browser": [
+        "e2e/members.e2e.ts#M2. an adult joins with the code; a wrong code is refused"
+      ],
+      "db": ["tests/family-members.test.ts"]
+    },
+    {
+      "id": "members:039",
+      "role": "family member",
+      "scenario": "M3. members get no guardian controls, in the UI or the API",
+      "browser": [
+        "e2e/members.e2e.ts#M3. members get no guardian controls, in the UI or the API"
+      ],
+      "db": ["tests/family-members.test.ts"]
+    },
+    {
+      "id": "members:040",
+      "role": "family member",
+      "scenario": "M4. a member hosts on their own device; both devices see the same live game",
+      "browser": [
+        "e2e/members.e2e.ts#M4. a member hosts on their own device; both devices see the same live game"
+      ],
+      "db": ["tests/family-members.test.ts"]
+    },
+    {
+      "id": "members:041",
+      "role": "family member",
+      "scenario": "M5. removing a member ends their access immediately",
+      "browser": [
+        "e2e/members.e2e.ts#M5. removing a member ends their access immediately"
+      ],
+      "db": ["tests/family-members.test.ts"]
+    },
+    {
+      "id": "members:042",
+      "role": "family member",
+      "scenario": "M6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface",
+      "browser": [
+        "e2e/members.e2e.ts#M6. accessibility (axe WCAG 2.2 AA) and no overflow on every new surface"
+      ],
+      "db": []
+    },
+    {
+      "id": "members:043",
+      "role": "family member",
+      "scenario": "M7. no uncaught client console errors",
+      "browser": ["e2e/members.e2e.ts#M7. no uncaught client console errors"],
+      "db": []
+    },
+    {
+      "id": "platform:044",
+      "role": "admin / guardian",
+      "scenario": "QZ-22/23: admin drafts a challenge; publish is refused until quality checks pass",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-22/23: admin drafts a challenge; publish is refused until quality checks pass"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:045",
+      "role": "admin / guardian",
+      "scenario": "QZ-21: admin sets subject/difficulty; families filter by them",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-21: admin sets subject/difficulty; families filter by them"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:046",
+      "role": "admin / guardian",
+      "scenario": "QZ-22: a new version supersedes the old one; families play the newest",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-22: a new version supersedes the old one; families play the newest"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:047",
+      "role": "admin / guardian",
+      "scenario": "QZ-24: completion earns badges and a PRD level on the Passport",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-24: completion earns badges and a PRD level on the Passport"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:048",
+      "role": "admin / guardian",
+      "scenario": "QZ-25: practice rounds play fully but record no XP or badges",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-25: practice rounds play fully but record no XP or badges"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:049",
+      "role": "admin / guardian",
+      "scenario": "QZ-26: Parent Hub progress by explorer and history beyond the newest 100",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-26: Parent Hub progress by explorer and history beyond the newest 100"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:050",
+      "role": "admin / guardian",
+      "scenario": "QZ-27: a new consent version gates new play until the guardian accepts",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-27: a new consent version gates new play until the guardian accepts"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:051",
+      "role": "admin / guardian",
+      "scenario": "QZ-28: staff operations tiles show aggregates only",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-28: staff operations tiles show aggregates only"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:052",
+      "role": "admin / guardian",
+      "scenario": "QZ-29: the guardian's daily hint limit is shown and enforced",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-29: the guardian's daily hint limit is shown and enforced"
+      ],
+      "db": [
+        "tests/content.test.ts",
+        "tests/progression.test.ts",
+        "tests/practice.test.ts",
+        "tests/consent.test.ts",
+        "tests/ops.test.ts",
+        "tests/q-budget.test.ts",
+        "tests/q-provider.test.ts"
+      ]
+    },
+    {
+      "id": "platform:053",
+      "role": "admin / guardian",
+      "scenario": "QZ-30: accessibility and layout across every new surface (390 + 1280)",
+      "browser": [
+        "e2e/platform.e2e.ts#QZ-30: accessibility and layout across every new surface (390 + 1280)"
+      ],
+      "db": []
+    },
+    {
+      "id": "platform:054",
+      "role": "admin / guardian",
+      "scenario": "no uncaught client console errors",
+      "browser": ["e2e/platform.e2e.ts#no uncaught client console errors"],
+      "db": []
+    },
+    {
+      "id": "resilience:055",
+      "role": "platform",
+      "scenario": "1. reset-password refuses an ordinary signed-in session (recovery link required)",
+      "browser": [
+        "e2e/resilience.e2e.ts#1. reset-password refuses an ordinary signed-in session (recovery link required)"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:056",
+      "role": "platform",
+      "scenario": "2. dropped polls show a reconnect state and recover without losing the session",
+      "browser": [
+        "e2e/resilience.e2e.ts#2. dropped polls show a reconnect state and recover without losing the session"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:057",
+      "role": "platform",
+      "scenario": "3. a failed write (503) is surfaced, nothing is saved, and retry succeeds exactly once",
+      "browser": [
+        "e2e/resilience.e2e.ts#3. a failed write (503) is surfaced, nothing is saved, and retry succeeds exactly once"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:058",
+      "role": "platform",
+      "scenario": "4. a lost response after the server saved is safe to retry: no duplicate answer or double score",
+      "browser": [
+        "e2e/resilience.e2e.ts#4. a lost response after the server saved is safe to retry: no duplicate answer or double score"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:059",
+      "role": "platform",
+      "scenario": "5. database internals are not leaked in API errors",
+      "browser": [
+        "e2e/resilience.e2e.ts#5. database internals are not leaked in API errors"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:060",
+      "role": "platform",
+      "scenario": "6. password re-verification is rate limited (10 per 15 minutes)",
+      "browser": [
+        "e2e/resilience.e2e.ts#6. password re-verification is rate limited (10 per 15 minutes)"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "resilience:061",
+      "role": "platform",
+      "scenario": "7. draft challenge titles are hidden from guardians end-to-end",
+      "browser": [
+        "e2e/resilience.e2e.ts#7. draft challenge titles are hidden from guardians end-to-end"
+      ],
+      "db": [
+        "tests/hardening.test.ts",
+        "tests/errors.test.ts",
+        "tests/validation.test.ts"
+      ]
+    },
+    {
+      "id": "safezone-journey:062",
+      "role": "moderator / guardian",
+      "scenario": "1. SafeZone is closed to families until an operator enables it",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#1. SafeZone is closed to families until an operator enables it"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:063",
+      "role": "moderator / guardian",
+      "scenario": "2. only an operator-granted moderator gets the console; moderator drafts and publishes a town hall",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#2. only an operator-granted moderator gets the console; moderator drafts and publishes a town hall"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:064",
+      "role": "moderator / guardian",
+      "scenario": "3. guardian enables SafeZone and gives per-session consent with their password; age band enforced",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#3. guardian enables SafeZone and gives per-session consent with their password; age band enforced"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:065",
+      "role": "moderator / guardian",
+      "scenario": "4. second household registers; consent API without a password is refused",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#4. second household registers; consent API without a password is refused"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:066",
+      "role": "moderator / guardian",
+      "scenario": "5. cross-family isolation: room, REST, and API refuse the other household's explorer",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#5. cross-family isolation: room, REST, and API refuse the other household's explorer"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:067",
+      "role": "moderator / guardian",
+      "scenario": "6. explorers wait until the moderator opens and starts the room",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#6. explorers wait until the moderator opens and starts the room"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:068",
+      "role": "moderator / guardian",
+      "scenario": "6b. a dropped room connection shows Reconnecting… and recovers in place",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#6b. a dropped room connection shows Reconnecting… and recovers in place"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:069",
+      "role": "moderator / guardian",
+      "scenario": "7. raise hand → moderator grants the turn → statement shared → held for approval → visible to peers by session name only",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#7. raise hand → moderator grants the turn → statement shared → held for approval → visible to peers by session name only"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:070",
+      "role": "moderator / guardian",
+      "scenario": "8. questions are anonymous to peers",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#8. questions are anonymous to peers"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:071",
+      "role": "moderator / guardian",
+      "scenario": "9. polls: one vote per explorer; results only after closing",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#9. polls: one vote per explorer; results only after closing"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:072",
+      "role": "moderator / guardian",
+      "scenario": "10. reports reach the safeguarding queue and the decision is recorded",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#10. reports reach the safeguarding queue and the decision is recorded"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:073",
+      "role": "moderator / guardian",
+      "scenario": "11. moderator removes a participant with a reason; their guardian is notified",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#11. moderator removes a participant with a reason; their guardian is notified"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:074",
+      "role": "moderator / guardian",
+      "scenario": "12. idea support, completion, and a privacy-safe summary",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#12. idea support, completion, and a privacy-safe summary"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:075",
+      "role": "moderator / guardian",
+      "scenario": "12b. one journey: Parent Hub and the family data export include SafeZone activity",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#12b. one journey: Parent Hub and the family data export include SafeZone activity"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:076",
+      "role": "moderator / guardian",
+      "scenario": "13. responsive and accessible: lobby, room, and console at 390 / 1024 / 1280",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#13. responsive and accessible: lobby, room, and console at 390 / 1024 / 1280"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:077",
+      "role": "moderator / guardian",
+      "scenario": "13b. keyboard: every Tab stop in the moderator console is visible and focus is never lost",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#13b. keyboard: every Tab stop in the moderator console is visible and focus is never lost"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:078",
+      "role": "moderator / guardian",
+      "scenario": "14. withdrawing consent removes the explorer's contributions from the record",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#14. withdrawing consent removes the explorer's contributions from the record"
+      ],
+      "db": ["tests/safezone.test.ts"]
+    },
+    {
+      "id": "safezone-journey:079",
+      "role": "moderator / guardian",
+      "scenario": "15. no uncaught client console errors",
+      "browser": [
+        "e2e/safezone-journey.e2e.ts#15. no uncaught client console errors"
+      ],
+      "db": []
+    },
+    {
+      "id": "zones:080",
+      "role": "explorer / guardian",
+      "scenario": "1. SolveZone: budget guard on client and server, saved plan, events, completion",
+      "browser": [
+        "e2e/zones.e2e.ts#1. SolveZone: budget guard on client and server, saved plan, events, completion"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:081",
+      "role": "explorer / guardian",
+      "scenario": "2. BuildZone: costed blueprint, overspend refused, design saved, pitch steps complete",
+      "browser": [
+        "e2e/zones.e2e.ts#2. BuildZone: costed blueprint, overspend refused, design saved, pitch steps complete"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:082",
+      "role": "explorer / guardian",
+      "scenario": "3. DebateZone: six fixed stages, no free-text field anywhere, completion",
+      "browser": [
+        "e2e/zones.e2e.ts#3. DebateZone: six fixed stages, no free-text field anywhere, completion"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:083",
+      "role": "explorer / guardian",
+      "scenario": "4. Q hints: off by default, guardian enables, hint logged in Parent Hub, operator pause respected",
+      "browser": [
+        "e2e/zones.e2e.ts#4. Q hints: off by default, guardian enables, hint logged in Parent Hub, operator pause respected"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:084",
+      "role": "explorer / guardian",
+      "scenario": "5. game report → admin review → guardian sees the decision",
+      "browser": [
+        "e2e/zones.e2e.ts#5. game report → admin review → guardian sees the decision"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:085",
+      "role": "explorer / guardian",
+      "scenario": "6. CMS: admin draft is invisible and unplayable until age review + publish",
+      "browser": [
+        "e2e/zones.e2e.ts#6. CMS: admin draft is invisible and unplayable until age review + publish"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:086",
+      "role": "explorer / guardian",
+      "scenario": "7. WorldZone: permission gate, completion, household-private passport stamp",
+      "browser": [
+        "e2e/zones.e2e.ts#7. WorldZone: permission gate, completion, household-private passport stamp"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:087",
+      "role": "explorer / guardian",
+      "scenario": "8. operator kill switch: a paused zone is shown as paused and refused by the server",
+      "browser": [
+        "e2e/zones.e2e.ts#8. operator kill switch: a paused zone is shown as paused and refused by the server"
+      ],
+      "db": [
+        "tests/database.test.ts",
+        "tests/zone-flags.test.ts",
+        "tests/quickzone-scoring.test.ts"
+      ]
+    },
+    {
+      "id": "zones:088",
+      "role": "explorer / guardian",
+      "scenario": "9. accessibility and layout across every zone surface (390 + 1280)",
+      "browser": [
+        "e2e/zones.e2e.ts#9. accessibility and layout across every zone surface (390 + 1280)"
+      ],
+      "db": []
+    },
+    {
+      "id": "zones:089",
+      "role": "explorer / guardian",
+      "scenario": "10. no uncaught client console errors",
+      "browser": ["e2e/zones.e2e.ts#10. no uncaught client console errors"],
+      "db": []
+    },
+    {
+      "id": "db:090",
+      "role": "platform",
+      "scenario": "Every post-pilot migration rolls back and forward cleanly",
+      "browser": [],
+      "db": ["tests/rollback.test.ts"],
+      "dbOnlyReason": "No user-facing journey; verified at the database/unit layer."
+    },
+    {
+      "id": "db:091",
+      "role": "platform",
+      "scenario": "Dependency tooling and audit facade behave as specified",
+      "browser": [],
+      "db": ["tests/tooling.test.ts"],
+      "dbOnlyReason": "No user-facing journey; verified at the database/unit layer."
+    },
+    {
+      "id": "db:092",
+      "role": "platform",
+      "scenario": "PRD levels are computed only from recorded XP",
+      "browser": [],
+      "db": ["tests/progress.test.ts"],
+      "dbOnlyReason": "No user-facing journey; verified at the database/unit layer."
+    },
+    {
+      "id": "db:093",
+      "role": "platform",
+      "scenario": "The scenario catalog stays in sync with every automated test",
+      "browser": [],
+      "db": ["tests/scenarios.test.ts"],
+      "dbOnlyReason": "Meta-check over the test suites themselves."
+    }
+  ]
+}
