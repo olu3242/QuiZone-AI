@@ -49,7 +49,7 @@ function seed(uid: string, i: number, choice: number) {
         perform public.qz_command('permissions', '{"world":true,"q":false,"minutes":60}'::jsonb);
         perform public.qz_command('child', '{"nickname":"Seedling${i}","age":11,"avatar":"owl","interest":"world"}'::jsonb);
         select c.id into kid from public.child_profiles c join public.households h on h.id=c.household_id where h.guardian_id='${uid}';
-        s := (public.qz_command('create', jsonb_build_object('challenge',(select id from public.challenges where mode='world' limit 1),'children',jsonb_build_array(kid)))->>'session')::uuid;
+        s := (public.qz_command('create', jsonb_build_object('challenge',(select id from public.challenges where mode='world' and title='Water-wise cities'),'children',jsonb_build_array(kid)))->>'session')::uuid;
         perform public.qz_command('transition', jsonb_build_object('session',s,'state','ready'));
         perform public.qz_command('transition', jsonb_build_object('session',s,'state','active'));
         for st in select cs.id from public.challenge_steps cs join public.game_sessions g on g.challenge_version_id=cs.version_id where g.id=s order by cs.ordinal loop

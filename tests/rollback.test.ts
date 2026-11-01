@@ -47,6 +47,10 @@ test("every post-pilot migration has a matching down script", () => {
 
 // Checks that must hold right after each named migration is rolled back.
 const afterDown: Record<string, () => Promise<void>> = {
+  _workflow_os: async () => {
+    assert.equal(await exists("private.wf_runs"), false);
+    assert.equal(await fn("public.qz_workflows()"), false);
+  },
   _cms_country: async () =>
     assert.equal(await fn("private.cms_country(jsonb)"), false),
   _ops_automation: async () => {

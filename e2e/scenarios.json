@@ -975,6 +975,76 @@
       "browser": [],
       "db": ["tests/scenarios.test.ts"],
       "dbOnlyReason": "Meta-check over the test suites themselves."
+    },
+    {
+      "id": "workflows:094",
+      "role": "admin",
+      "scenario": "W1. the console lists every workflow with its live version, trigger, and steps",
+      "browser": [
+        "e2e/workflows.e2e.ts#W1. the console lists every workflow with its live version, trigger, and steps"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:095",
+      "role": "admin",
+      "scenario": "W2. a completed game runs the badge workflow end to end, with a step log",
+      "browser": [
+        "e2e/workflows.e2e.ts#W2. a completed game runs the badge workflow end to end, with a step log"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:096",
+      "role": "admin",
+      "scenario": "W3. pausing a workflow queues its runs; resuming and ticking delivers them",
+      "browser": [
+        "e2e/workflows.e2e.ts#W3. pausing a workflow queues its runs; resuming and ticking delivers them"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:097",
+      "role": "admin",
+      "scenario": "W4. a dead-letter run can be retried from the console",
+      "browser": [
+        "e2e/workflows.e2e.ts#W4. a dead-letter run can be retried from the console"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:098",
+      "role": "admin",
+      "scenario": "W5. guardians can't see or steer workflows",
+      "browser": [
+        "e2e/workflows.e2e.ts#W5. guardians can't see or steer workflows"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:099",
+      "role": "admin",
+      "scenario": "W6. pg_cron runs the runtime every minute on the real stack",
+      "browser": [
+        "e2e/workflows.e2e.ts#W6. pg_cron runs the runtime every minute on the real stack"
+      ],
+      "db": ["tests/workflow-os.test.ts"]
+    },
+    {
+      "id": "workflows:100",
+      "role": "admin",
+      "scenario": "W7. accessibility (axe WCAG 2.2 AA) and no overflow",
+      "browser": [
+        "e2e/workflows.e2e.ts#W7. accessibility (axe WCAG 2.2 AA) and no overflow"
+      ],
+      "db": []
+    },
+    {
+      "id": "workflows:101",
+      "role": "admin",
+      "scenario": "W8. no uncaught client console errors",
+      "browser": ["e2e/workflows.e2e.ts#W8. no uncaught client console errors"],
+      "db": []
     }
   ]
 }

@@ -1,4 +1,5 @@
 "use client";
+import { WorkflowsConsole } from "../workflows-console";
 import { MaintenancePanel } from "../maintenance-panel";
 import { ExplorerLocked } from "../explorer-mode";
 import { difficulties, subjects, zones } from "@/lib/content";
@@ -46,6 +47,7 @@ export function AdminPage() {
       <Feedback message={message} />
       <OpsOverview />
       <MaintenancePanel />
+      <WorkflowsConsole />
       <div className="content-split">
         <section>
           <h2>Challenge library</h2>

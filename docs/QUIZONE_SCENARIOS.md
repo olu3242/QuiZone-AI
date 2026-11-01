@@ -2,7 +2,7 @@
 
 Generated from `e2e/scenarios.json` by `node scripts/scenarios.mjs`. `tests/scenarios.test.ts` fails if a scenario cites a test that doesn't exist, or if any browser test or DB test file isn't mapped here.
 
-**93 scenarios** · 89 with browser evidence · 4 DB-only (with a stated reason).
+**101 scenarios** · 97 with browser evidence · 4 DB-only (with a stated reason).
 
 ## Admin / guardian
 
@@ -131,3 +131,16 @@ Generated from `e2e/scenarios.json` by `node scripts/scenarios.mjs`. `tests/scen
 | zones:087 | 8. operator kill switch: a paused zone is shown as paused and refused by the server               | `e2e/zones.e2e.ts` | `tests/database.test.ts`, `tests/zone-flags.test.ts`, `tests/quickzone-scoring.test.ts` |
 | zones:088 | 9. accessibility and layout across every zone surface (390 + 1280)                                | `e2e/zones.e2e.ts` | —                                                                                       |
 | zones:089 | 10. no uncaught client console errors                                                             | `e2e/zones.e2e.ts` | —                                                                                       |
+
+## Admin
+
+| ID            | Scenario                                                                       | Browser evidence       | DB / unit evidence          |
+| ------------- | ------------------------------------------------------------------------------ | ---------------------- | --------------------------- |
+| workflows:094 | W1. the console lists every workflow with its live version, trigger, and steps | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:095 | W2. a completed game runs the badge workflow end to end, with a step log       | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:096 | W3. pausing a workflow queues its runs; resuming and ticking delivers them     | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:097 | W4. a dead-letter run can be retried from the console                          | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:098 | W5. guardians can't see or steer workflows                                     | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:099 | W6. pg_cron runs the runtime every minute on the real stack                    | `e2e/workflows.e2e.ts` | `tests/workflow-os.test.ts` |
+| workflows:100 | W7. accessibility (axe WCAG 2.2 AA) and no overflow                            | `e2e/workflows.e2e.ts` | —                           |
+| workflows:101 | W8. no uncaught client console errors                                          | `e2e/workflows.e2e.ts` | —                           |

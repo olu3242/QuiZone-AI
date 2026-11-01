@@ -232,6 +232,19 @@ export const actionSchema = z.discriminatedUnion("action", [
     }),
   }),
   z.object({
+    action: z.enum(["wf_pause", "wf_resume"]),
+    data: z.object({
+      workflow: z
+        .string()
+        .regex(/^[a-z][a-z0-9_.]{2,60}$/, "Unknown workflow."),
+    }),
+  }),
+  z.object({
+    action: z.literal("wf_retry"),
+    data: z.object({ run: z.number().int().positive() }),
+  }),
+  z.object({ action: z.literal("wf_tick"), data: z.object({}) }),
+  z.object({
     action: z.literal("cms_country"),
     data: z.object({
       challenge: z.string().uuid(),
@@ -462,6 +475,10 @@ export const safezoneConsentSchema = z.discriminatedUnion("action", [
   }),
 ]);
 export const adminActions = [
+  "wf_pause",
+  "wf_resume",
+  "wf_retry",
+  "wf_tick",
   "cms_meta",
   "cms_country",
   "cms_step_add",

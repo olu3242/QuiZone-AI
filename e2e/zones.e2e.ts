@@ -397,7 +397,7 @@ test("8. operator kill switch: a paused zone is shown as paused and refused by t
     true,
   );
   const challenge = operatorSql(
-    "select id from public.challenges where mode='build'",
+    "select id from public.challenges where mode='build' and title='The brilliant bus stop'",
   );
   const kid = operatorSql(
     `select c.id from public.child_profiles c join public.households h on h.id=c.household_id join auth.users u on u.id=h.guardian_id where u.email='${G.email}'`,

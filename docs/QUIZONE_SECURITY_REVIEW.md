@@ -51,6 +51,16 @@ Scope: this branch's dependency changes, two new migrations, `/api/account`, new
 | Q provider        | Official SDK, server-only key, admin-only route, flag off, `reauth`-style DB bucket (30/h), screening, audit row per suggestion, content-only prompt         | No model output reaches a child without a person editing and publishing it                                                                                                                                                           |
 | Multi-device sync | Polling with a newest-response guard                                                                                                                         | **Fixed:** an older in-flight poll could overwrite a newer state after an action (found by the Explorer suite)                                                                                                                       |
 
+## QZ-39 review (Workflow OS)
+
+| Area                | Control                                                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Arbitrary execution | Definitions can only name whitelisted actions (trigger-enforced); no dynamic SQL from data                                                                                     |
+| Access              | All `private.wf_*` objects revoked from clients; admin overview and commands check the staff role in the database; routes refuse Explorer-mode sessions; every command audited |
+| Data exposure       | Overview returns workflow keys, statuses, counts, durations, and scrubbed errors only (no household ids, payloads, or names; DB-tested)                                        |
+| Reliability         | Idempotency keys on events, unique (workflow, event) runs, `for update skip locked`, bounded retries with backoff, dead letters kept for review, pause never drops work        |
+| Cascades            | Emitting for a household that is being deleted is skipped, so account deletion can't fail on the outbox                                                                        |
+
 ## QZ-35–38 review (maintenance, family inbox, portfolio, CMS country)
 
 | Area          | Control                                                                                                                                                          | Note                                                                                                            |

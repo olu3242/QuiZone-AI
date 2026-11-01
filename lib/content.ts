@@ -166,3 +166,13 @@ export const portfolioCopy = {
     mural: "Community mural",
   },
 } as const;
+
+// QZ-39: Workflow OS run statuses (admin console).
+export const workflowStatusLabels: Record<string, string> = {
+  pending: "Pending",
+  running: "Running",
+  succeeded: "Succeeded",
+  failed: "Retrying",
+  dead: "Dead letter",
+  paused: "Paused",
+};

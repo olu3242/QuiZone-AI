@@ -109,6 +109,12 @@ before(async () => {
   );
 });
 after(async () => {
+  // Retire this suite's challenges through the CMS so later suites see the seeded catalog.
+  const versions = operatorSql(
+    `select string_agg(v.id::text, ',') from public.challenge_versions v join public.challenges c on c.id=v.challenge_id where c.title like 'Teen % lab ${run}' and v.status='published'`,
+  );
+  for (const version of versions.split(",").filter(Boolean))
+    await cmd(adm, "cms_version_retire", { version }).catch(() => undefined);
   operatorSql(
     `delete from private.staff where user_id in (select id from auth.users where email='${ADM.email}')`,
   );
