@@ -1,3 +1,4 @@
+import { explorerLocked, LOCKED_MESSAGE } from "@/lib/household";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { guardian } from "@/lib/supabase";
@@ -18,6 +19,11 @@ export async function GET(req: NextRequest) {
         { status: 400, headers },
       );
     const { db, user } = await guardian();
+    if (await explorerLocked(db))
+      return NextResponse.json(
+        { error: LOCKED_MESSAGE },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
     const { data: house } = await db
       .from("households")
       .select("id")

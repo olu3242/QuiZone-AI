@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { guardian } from "./supabase";
+import { actingHousehold } from "./household";
 import type { Answer, Challenge, Session, Step, Version } from "./types";
 export type GameData = {
   serverNow: number;
@@ -19,12 +20,9 @@ export type GameData = {
 };
 export async function gameData(rawId: string): Promise<GameData> {
   const id = z.string().uuid().parse(rawId);
-  const { db, user } = await guardian();
-  const { data: house } = await db
-    .from("households")
-    .select("id")
-    .eq("guardian_id", user.id)
-    .single();
+  const { db } = await guardian();
+  // Guardian or invited family member, on any of their devices.
+  const house = await actingHousehold(db);
   if (!house) throw new Error("Permission denied.");
   const { data: session, error } = await db
     .from("game_sessions")

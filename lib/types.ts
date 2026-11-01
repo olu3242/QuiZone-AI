@@ -56,7 +56,14 @@ export type Answer = {
   feedback: string;
 };
 export type Snapshot = {
-  household: { id: string; name: string } | null;
+  household: {
+    id: string;
+    name: string;
+    role: "guardian" | "member";
+    displayName: string | null;
+  } | null;
+  members: { user_id: string; display_name: string; joined_at: string }[];
+  invites: { id: string; created_at: string; expires_at: string }[];
   children: Child[];
   permissions: {
     world: boolean;
@@ -78,6 +85,7 @@ export type Snapshot = {
   schedules: { id: string; scheduled_at: string; mode: string }[];
   qLogs: { id: string; output: string; created_at: string }[];
   admin: boolean;
+  locked: boolean;
   flags: Record<string, boolean>;
   consent: {
     current: number;

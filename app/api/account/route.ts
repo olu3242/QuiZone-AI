@@ -1,3 +1,4 @@
+import { explorerLocked, LOCKED_MESSAGE } from "@/lib/household";
 import { NextResponse, type NextRequest } from "next/server";
 import { guardian } from "@/lib/supabase";
 import { sameOrigin } from "@/lib/http";
@@ -12,6 +13,11 @@ const fail = (error: string, status = 400) =>
 export async function GET() {
   try {
     const { db, user } = await guardian();
+    if (await explorerLocked(db))
+      return NextResponse.json(
+        { error: LOCKED_MESSAGE },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
     const { data: house, error } = await db
       .from("households")
       .select("id,name,consented_at,created_at")
@@ -223,10 +229,11 @@ export async function POST(req: NextRequest) {
       401,
     );
   }
+  const { db, user } = session;
+  if (await explorerLocked(db)) return fail(LOCKED_MESSAGE, 403);
   const parsed = accountSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success)
     return fail(parsed.error.issues.map((i) => i.message).join(" "));
-  const { db, user } = session;
   const input = parsed.data;
   if (input.action === "change-password") {
     // Re-verify the current password so a borrowed, signed-in device can't take over.

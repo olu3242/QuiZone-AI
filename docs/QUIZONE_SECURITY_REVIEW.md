@@ -39,3 +39,14 @@ Scope: this branch's dependency changes, two new migrations, `/api/account`, new
 | Low                            | `GET /api/account` writes an audit row (side effect on GET)                | Acceptable (SameSite=Lax blocks cross-site subresource cookies); move to POST if export grows heavier                               |
 | ~~Info~~ **Fixed `f01e035`**   | Draft challenge titles readable by guardians                               | Policy limited to published, owned-session, or admin (DB hardening 5, E2E resilience 7)                                             |
 | Info                           | Supabase advisors not run against a hosted project                         | Run `get_advisors` once a QuiZone project exists                                                                                    |
+
+## QZ-31–34 review (family members, Explorer mode, Global Connect, Q provider)
+
+| Area | Control | Finding during review |
+| --- | --- | --- |
+| Invite codes | 48 bits from the CSPRNG behind `gen_random_uuid`, SHA-256 stored, single-use, 72 h, ≤ 3 outstanding; the hash column is not granted to clients | **Fixed before commit:** a wrong code raised, which rolled back its own rate-limit hit, so guessing was unmetered (including via direct RPC). Wrong codes now return `{joined:false}` and commit the hit (10/h per account; DB test) |
+| Member scope | `private.member_of` for play reads; `private.owns` (guardian, unlocked) for oversight reads; router and `lib/authorize.ts` refuse guardian-only commands | `private.command` was copied from the pilot with three marked changes; the rollback restores the pilot text |
+| Explorer mode | Lock row keyed by JWT `session_id` + `auth.uid()`; router allow-list; RLS through `private.owns`; guardian routes (including Auth calls) refuse while locked | Residual: the token can reach the Auth API directly; relies on secure password/email change (deployment checklist) |
+| Global Connect | k ≥ 5 households per step, one vote per household, practice excluded, percentages only | With exactly five households a family can infer how the other four answered in total (no identities). Accepted for aggregate-only scope |
+| Q provider | Official SDK, server-only key, admin-only route, flag off, `reauth`-style DB bucket (30/h), screening, audit row per suggestion, content-only prompt | No model output reaches a child without a person editing and publishing it |
+| Multi-device sync | Polling with a newest-response guard | **Fixed:** an older in-flight poll could overwrite a newer state after an action (found by the Explorer suite) |

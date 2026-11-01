@@ -1,7 +1,8 @@
 "use client";
 import type { Challenge } from "@/lib/types";
 import type { AppAction } from "@/lib/validation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useFamily } from "./workspace";
 
 type Step = {
   id: string;
@@ -37,7 +38,57 @@ function stepPayload(f: FormData) {
   };
 }
 
+// Live-model help for authors (flag q_live). The suggestion only fills the field;
+// the author edits it and it is saved and published through the normal gates.
+function QSuggest({
+  step,
+  onHint,
+}: {
+  step: string;
+  onHint: (text: string) => void;
+}) {
+  const [busy, setBusy] = useState(false),
+    [note, setNote] = useState("");
+  return (
+    <div className="q-suggest">
+      <button
+        type="button"
+        className="btn secondary small"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          setNote("");
+          try {
+            const r = await fetch("/api/q/suggest", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ step }),
+            });
+            const j = await r.json();
+            if (!r.ok) throw new Error(j.error || "Q is unavailable.");
+            onHint(j.hint);
+            setNote("Suggestion added. Review and edit it before saving.");
+          } catch (e) {
+            setNote(e instanceof Error ? e.message : "Q is unavailable.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? "Asking Q…" : "Suggest a hint with Q"}
+      </button>
+      {note && (
+        <span className="muted" role="status">
+          {note}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function StepFields({ step }: { step?: Step }) {
+  const { data } = useFamily();
+  const hint = useRef<HTMLTextAreaElement>(null);
   return (
     <>
       <label>
@@ -72,6 +123,7 @@ function StepFields({ step }: { step?: Step }) {
       <label>
         Hint
         <textarea
+          ref={hint}
           name="hint"
           required
           minLength={10}
@@ -79,6 +131,14 @@ function StepFields({ step }: { step?: Step }) {
           defaultValue={step?.hint}
         />
       </label>
+      {step && data?.flags?.q_live && (
+        <QSuggest
+          step={step.id}
+          onHint={(text) => {
+            if (hint.current) hint.current.value = text;
+          }}
+        />
+      )}
       <label>
         Explanation
         <textarea

@@ -10,7 +10,7 @@
 | Vercel project           | `qui-zone-ai` (`prj_At3aDMHerUaIExGySYmhvZEslB49`) in team Eduradius LLC is visible to the connector, but env-var listing returns 404 and deployment listing 403                                                                                                   | **BLOCKED — connector permission scope**                                                    |
 | Vercel production branch | `main` has no `app/` → builds fail until PR #1 (and this stack) merge                                                                                                                                                                                              | **Deployment blocker**                                                                      |
 | Supabase                 | Connector org has Foundry, MEDLINK, BTG AI (all inactive). **However**, the repo's Supabase GitHub integration reports a "Supabase Preview" check linked to project `orjremljufkflomsjelr` (skipped on PR #2). That project is in an org the connector cannot see. | **BLOCKED — grant connector access to that org, or confirm it is the intended UAT project** |
-| Migrations               | 14 files, applied cleanly to Supabase Postgres 17 locally; a reverse script for each of the 13 post-pilot migrations in `supabase/rollback/` (enforced by `tests/rollback.test.ts`); not applied anywhere hosted                                                   | Ready for review                                                                            |
+| Migrations               | 18 files, applied cleanly to Supabase Postgres 17 locally; a reverse script for each of the 17 post-pilot migrations in `supabase/rollback/` (enforced by `tests/rollback.test.ts`); not applied anywhere hosted                                                   | Ready for review                                                                            |
 | Auth callbacks           | Code uses `${NEXT_PUBLIC_SITE_URL}/auth/callback` and `.../auth/callback?next=/reset-password`                                                                                                                                                                     | Must be allow-listed per environment                                                        |
 
 ## Missing environment variables (names only)
@@ -25,19 +25,24 @@ Operator machine only (never in Vercel or the repo):
 
 - [ ] `SUPABASE_DB_URL` or `supabase login` + `supabase link` for migration push
 
-Not needed: any service-role key (the app never uses one). Future, when Q goes live: a server-only provider key (name TBD with the provider choice).
+Not needed: any service-role key (the app never uses one).
+
+Optional, server-only (Vercel env, **never** `NEXT_PUBLIC_`): `ANTHROPIC_API_KEY` for Q authoring suggestions; `QZ_Q_MODEL` to override the default model. Without the key the feature reports "not configured" and nothing else changes.
 
 ## SafeZone operator controls (no app UI by design)
 
 - [ ] Leave `private.feature_flags.safezone = false` until the gates in `SAFEZONE_SAFETY_REVIEW.md` §4 close.
 - [ ] Grant moderators with SQL into `private.staff`, only after vetting and training.
 - [ ] Zone kill switches (`zone_quick`, `zone_solve`, `zone_build`, `zone_debate`, `zone_world`, `q_hints`) ship **on**. Pause one with `update private.feature_flags set enabled=false where flag='…'`. This blocks new sessions; ones already started can finish.
-- [ ] After any hosted E2E run, confirm `safezone` is `false` (the suite restores it, but verify).
+- [ ] After any hosted E2E run, confirm `safezone` and `q_live` are `false` (the suites restore them, but verify).
+- [ ] `global_compare` ships **on** (aggregates only, k ≥ 5). `q_live` ships **off**; turn it on only after the API key is set and authors are briefed that suggestions must be reviewed.
+- [ ] Explorer-mode locks live in `private.explorer_locks`; they expire with the Auth session and are pruned after 30 days.
 - [ ] Publishing a new family consent version gates all new play until each guardian accepts it: `insert into public.consent_versions(version,summary,body) values(…)`. Have the text legally reviewed first.
 
 ## Supabase project settings required
 
 - [ ] Email confirmation **on**; minimum password length 12
+- [ ] **Secure password change on** and **secure email change on** (Explorer mode relies on them: a locked session's token can still reach the Auth API, so changing the password or email must need re-authentication or confirmation)
 - [ ] Site URL = preview origin; redirect allow-list = exact `/auth/callback` and `/auth/callback?next=/reset-password` URLs (no broad wildcards)
 - [ ] Custom SMTP for confirmation/recovery mail
 - [ ] Auth email rate limit appropriate for UAT (local config raised to 20/h for E2E only)

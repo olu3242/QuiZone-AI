@@ -17,8 +17,10 @@ async function account(body: Record<string, unknown>) {
 
 export function AccountPrivacy({
   householdName,
+  member = false,
 }: {
   householdName: string | null;
+  member?: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(""),
@@ -69,7 +71,7 @@ export function AccountPrivacy({
         </p>
       )}
       <div className="account-actions">
-        {householdName && (
+        {householdName && !member && (
           <a className="btn secondary small" href="/api/account" download>
             <Download size={16} /> Download family data
           </a>

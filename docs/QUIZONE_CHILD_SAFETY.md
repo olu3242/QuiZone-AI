@@ -17,6 +17,10 @@
 | Progress is honest                                                   | Levels and badges only from server-recorded completions; practice rounds record none; copy says progress is not a measure of ability                                                                          | All                | DB progression, practice; E2E platform QZ-24–26 |
 | Consent withdrawal                                                   | Turning a permission off withdraws participation; SafeZone withdrawal erases contributions and votes                                                                                                          | World, Q, SafeZone | DB; E2E S14                                     |
 | Account / child deletion                                             | Deletion cascades through every zone, plus a ledger entry with no identifying data                                                                                                                            | All                | DB family-controls, safezone 16–17; E2E F15     |
+| §1 Other adults are guardian-invited                                 | Family members join only with a guardian-issued, single-use, expiring code (hash stored). Members can't manage explorers, permissions, consent, SafeZone, export, or invitations (API and DB). Removal ends access at once | All                | DB family-members; E2E members M1–M5            |
+| Children can't gain guardian powers from the client                  | Explorer mode is a database row keyed by the Auth session id in the JWT. While locked, the router allows play commands only and RLS hides oversight data; only the adult's password (a new session) unlocks | All                | DB explorer-mode; E2E explorer X1–X5            |
+| §3 Cross-household views are aggregate                               | Global Connect returns per-step percentages only after ≥ 5 households answered; one vote per household; no names or ids          | World              | DB global-connect; E2E global G1–G3             |
+| §5 Q output is reviewed before a child sees it                       | The Claude adapter only suggests text to administrators in the CMS; screened (links, contacts, answer reveals, chat, unsafe words), audited, rate-limited, flag off by default; publishing still needs the quality gate and age review | Q                  | Unit q-provider; E2E platform QZ-34             |
 | Abuse resistance                                                     | Rate limits on commands, password re-verification, and export; contribution and report caps                                                                                                                   | All                | DB hardening; E2E R6                            |
 
 ## Not yet satisfied (blocks real children)
@@ -24,4 +28,6 @@
 - Verifiable parental consent (legal); approved age bands (8–17 is a placeholder)
 - Moderator vetting and training program; a two-adult rule enforced in software
 - Retention schedule; whether safety records survive account deletion (legal)
-- International privacy review before cross-household WorldZone
+- International privacy review before cross-household WorldZone (now aggregate-only, k ≥ 5)
+- A trusted server-side writer and safeguarding review before any live child-facing Q output
+- Explorer mode residual risk: the locked session's token still reaches the Supabase Auth API directly. App routes refuse password changes while locked; Auth itself is protected by secure password/email change (must be on in every hosted project). Worst case for a tech-savvy child is signing the device out

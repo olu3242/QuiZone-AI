@@ -1,3 +1,4 @@
+import { explorerLocked, LOCKED_MESSAGE } from "@/lib/household";
 import { NextResponse } from "next/server";
 import { publicError } from "@/lib/errors";
 import { guardian } from "@/lib/supabase";
@@ -7,6 +8,11 @@ export async function GET() {
   const headers = { "Cache-Control": "private, no-store" };
   try {
     const { db } = await guardian();
+    if (await explorerLocked(db))
+      return NextResponse.json(
+        { error: LOCKED_MESSAGE },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
     const { data, error } = await db.rpc("qz_ops_overview");
     if (error) {
       const e = publicError(error, "ops:overview");

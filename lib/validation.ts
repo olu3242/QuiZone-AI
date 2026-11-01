@@ -276,6 +276,37 @@ export const actionSchema = z.discriminatedUnion("action", [
     action: z.literal("cms_version_retire"),
     data: z.object({ version: z.string().uuid() }),
   }),
+  z.object({ action: z.literal("member_invite"), data: z.object({}) }),
+  z.object({
+    action: z.literal("member_uninvite"),
+    data: z.object({ invite: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("member_remove"),
+    data: z.object({ member: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("member_join"),
+    data: z.object({
+      code: z
+        .string()
+        .trim()
+        .regex(/^[0-9A-Fa-f -]{12,16}$/, "Enter the 12-character invite code."),
+      displayName: z
+        .string()
+        .trim()
+        .regex(
+          /^[A-Za-z0-9 _-]{2,24}$/,
+          "Use a display name of 2 to 24 letters or numbers.",
+        ),
+    }),
+  }),
+  z.object({ action: z.literal("member_leave"), data: z.object({}) }),
+  z.object({ action: z.literal("explorer_lock"), data: z.object({}) }),
+  z.object({
+    action: z.literal("presence"),
+    data: z.object({ session: z.string().uuid() }),
+  }),
   z.object({
     action: z.literal("q_budget"),
     data: z.object({ limit: z.number().int().min(1).max(50) }),
@@ -418,6 +449,31 @@ export const adminActions = [
   "cms_version_update",
   "cms_version_new",
   "cms_version_retire",
+] as const;
+// The only actions an Explorer-mode (locked) session may take: play.
+export const explorerActions = [
+  "create",
+  "transition",
+  "answer",
+  "plan",
+  "blueprint",
+  "hint",
+  "report",
+  "presence",
+  "explorer_lock",
+] as const;
+// Actions only the household's guardian may take (members are refused in the API and the DB).
+export const guardianOnlyActions = [
+  "child",
+  "child_update",
+  "child_archive",
+  "child_delete",
+  "permissions",
+  "q_budget",
+  "consent_accept",
+  "member_invite",
+  "member_uninvite",
+  "member_remove",
 ] as const;
 export const moderatorActions = [
   "sz_hall_create",

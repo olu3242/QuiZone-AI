@@ -47,6 +47,19 @@ test("every post-pilot migration has a matching down script", () => {
 
 // Checks that must hold right after each named migration is rolled back.
 const afterDown: Record<string, () => Promise<void>> = {
+  _q_provider: async () =>
+    assert.equal(await fn("public.qz_q_suggest_log(uuid,text,integer)"), false),
+  _global_connect: async () =>
+    assert.equal(await fn("public.qz_world_compare(uuid)"), false),
+  _explorer_mode: async () => {
+    assert.equal(await exists("private.explorer_locks"), false);
+    assert.equal(await fn("public.qz_locked()"), false);
+  },
+  _family_members: async () => {
+    assert.equal(await exists("public.household_members"), false);
+    assert.equal(await fn("public.qz_household()"), false);
+    assert.equal(await fn("private.member_of(uuid)"), false);
+  },
   _q_budget: async () => assert.equal(await fn("public.qz_q_usage()"), false),
   _ops_overview: async () =>
     assert.equal(await fn("public.qz_ops_overview()"), false),

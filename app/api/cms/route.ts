@@ -1,3 +1,4 @@
+import { explorerLocked, LOCKED_MESSAGE } from "@/lib/household";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { publicError } from "@/lib/errors";
@@ -8,6 +9,11 @@ export async function GET(req: NextRequest) {
   const headers = { "Cache-Control": "private, no-store" };
   try {
     const { db } = await guardian();
+    if (await explorerLocked(db))
+      return NextResponse.json(
+        { error: LOCKED_MESSAGE },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
     const id = z
       .string()
       .uuid()

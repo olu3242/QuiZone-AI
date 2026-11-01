@@ -1,12 +1,20 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import "server-only";
-import { adminActions, moderatorActions, type AppAction } from "./validation";
+import { actingHousehold, explorerLocked, LOCKED_MESSAGE } from "./household";
+import {
+  adminActions,
+  explorerActions,
+  guardianOnlyActions,
+  moderatorActions,
+  type AppAction,
+} from "./validation";
 // Independent API authorization, in addition to RLS and transactional RPC checks.
-export async function authorize(
-  db: SupabaseClient,
-  userId: string,
-  input: AppAction,
-) {
+export async function authorize(db: SupabaseClient, input: AppAction) {
+  if (
+    !(explorerActions as readonly string[]).includes(input.action) &&
+    (await explorerLocked(db))
+  )
+    throw new Error(LOCKED_MESSAGE);
   if (["draft", "publish", "review"].includes(input.action)) {
     const { data, error } = await db.rpc("qz_is_staff", {
       required_role: input.action === "review" ? null : "admin",
@@ -30,13 +38,16 @@ export async function authorize(
       throw new Error("A SafeZone moderator role is required.");
     return;
   }
-  if (input.action === "household") return;
-  const { data: house, error } = await db
-    .from("households")
-    .select("id")
-    .eq("guardian_id", userId)
-    .single();
-  if (error || !house) throw new Error("Create a guardian household first.");
+  // Joining needs no household yet; the database checks the code and the caller.
+  if (input.action === "household" || input.action === "member_join") return;
+  const house = await actingHousehold(db);
+  if (!house) throw new Error("Create a guardian household first.");
+  if (
+    house.role !== "guardian" &&
+    ((guardianOnlyActions as readonly string[]).includes(input.action) ||
+      input.action.startsWith("sz_"))
+  )
+    throw new Error("Only the household's guardian can do this.");
   if ("child" in input.data) await ownsChild(db, house.id, input.data.child);
   if ("session" in input.data) {
     const { data: session, error } = await db

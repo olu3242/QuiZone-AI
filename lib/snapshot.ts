@@ -1,19 +1,15 @@
 import "server-only";
 import { guardian } from "./supabase";
+import { actingHousehold, explorerLocked } from "./household";
 import type { Snapshot } from "./types";
 export async function snapshot(): Promise<Snapshot> {
-  const { db, user } = await guardian();
-  const h = await db
-    .from("households")
-    .select("id,name")
-    .eq("guardian_id", user.id)
-    .maybeSingle();
-  if (h.error)
-    throw new Error(
-      "The QuiZone database is not ready. Apply the supplied migration.",
-    );
+  const { db } = await guardian();
+  const h = { data: await actingHousehold(db) };
+  const locked = await explorerLocked(db);
+  const isGuardian = h.data?.role === "guardian" && !locked;
   const { data: staff, error: staffError } = await db.rpc("qz_is_staff");
   if (staffError) throw new Error("The QuiZone database is not ready.");
+  const staffView = Boolean(staff) && !locked;
   // Operator kill switches; a missing map means "all on" for older databases.
   const { data: flags } = await db.rpc("qz_flags");
   const { data: consent } = await db.rpc("qz_consent_status");
@@ -69,7 +65,7 @@ export async function snapshot(): Promise<Snapshot> {
             .limit(20),
         ]
       : []),
-    ...(staff
+    ...(staffView
       ? [
           db
             .from("moderation_cases")
@@ -100,10 +96,38 @@ export async function snapshot(): Promise<Snapshot> {
           .eq("household_id", hid)
       : Promise.resolve({ data: [], error: null }),
   ]);
-  if (catalog.error || earned.error || family.error)
+  // Household adults: everyone sees who's in the family; only the guardian sees invites.
+  const [members, invites] = await Promise.all([
+    hid
+      ? db
+          .from("household_members")
+          .select("user_id,display_name,joined_at")
+          .eq("household_id", hid)
+          .order("joined_at")
+      : Promise.resolve({ data: [], error: null }),
+    hid && isGuardian
+      ? db
+          .from("household_invites")
+          .select("id,created_at,expires_at")
+          .eq("household_id", hid)
+          .is("used_at", null)
+          .is("revoked_at", null)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at")
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (
+    catalog.error ||
+    earned.error ||
+    family.error ||
+    members.error ||
+    invites.error
+  )
     throw new Error("Could not load family data. Please try again.");
   return {
     household: h.data,
+    members: members.data ?? [],
+    invites: invites.data ?? [],
     children: hid ? rows[1] : [],
     permissions: hid ? rows[2] : null,
     challenges: rows[0],
@@ -112,14 +136,15 @@ export async function snapshot(): Promise<Snapshot> {
     passport: hid ? rows[5] : [],
     reports: hid ? rows[6] : [],
     schedules: hid ? rows[7] : [],
-    qLogs: hid ? rows[8] : [],
-    admin: Boolean(staff),
+    qLogs: hid && !locked ? rows[8] : [],
+    admin: staffView,
+    locked,
     flags: (flags as Record<string, boolean> | null) ?? {},
-    consent: (consent as Snapshot["consent"]) ?? null,
+    consent: locked ? null : ((consent as Snapshot["consent"]) ?? null),
     qUsage: (qUsage as Snapshot["qUsage"]) ?? null,
     badges: catalog.data ?? [],
     childBadges: earned.data ?? [],
     familyBadges: family.data ?? [],
-    cases: staff ? rows[rows.length - 1] : [],
+    cases: staffView ? rows[rows.length - 1] : [],
   } as Snapshot;
 }

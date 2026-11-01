@@ -15,9 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Allocation } from "./allocation";
 import { Blueprint } from "./blueprint";
+import { GlobalCompare } from "./global-compare";
 import { command, useFamily } from "./workspace";
 export function Game({
   id,
@@ -38,17 +39,43 @@ export function Game({
     [hint, setHint] = useState(""),
     [reason, setReason] = useState("technical"),
     [notice, setNotice] = useState(""),
-    [now, setNow] = useState(initialNow);
+    [now, setNow] = useState(initialNow),
+    [devices, setDevices] = useState<{ label: string; you: boolean }[]>([]);
+  const live =
+    !!game &&
+    ["lobby", "ready", "active", "paused"].includes(game.session.state);
+  // Multi-device presence: each adult device with this game open checks in.
+  useEffect(() => {
+    if (!live) return;
+    const beat = () =>
+      command("presence", { session: id })
+        .then((r: { devices: { label: string; you: boolean }[] }) =>
+          setDevices(r.devices),
+        )
+        .catch(() => {});
+    const first = setTimeout(beat, 0),
+      t = setInterval(beat, 10000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(t);
+    };
+  }, [id, live]);
+  // Polls and post-action reloads overlap (and other devices act too): apply only the
+  // newest response so an older in-flight read can't roll the screen back.
+  const loadSeq = useRef(0);
   const load = useCallback(async () => {
+    const mine = ++loadSeq.current;
     try {
       const r = await fetch("/api/session?id=" + encodeURIComponent(id), {
           cache: "no-store",
         }),
         j = await r.json();
       if (!r.ok) throw new Error(j.error);
+      if (mine !== loadSeq.current) return;
       setGame(j);
       setError("");
     } catch (e) {
+      if (mine !== loadSeq.current) return;
       setError(
         e instanceof Error
           ? e.message
@@ -211,6 +238,15 @@ export function Game({
             <Users size={16} /> {players.length} explorers · One shared screen ·
             Guardian-led
           </div>
+          {devices.length > 0 && (
+            <p className="devices" aria-live="polite">
+              <strong>Open on:</strong>{" "}
+              {devices
+                .map((d) => (d.you ? `${d.label} (this device)` : d.label))
+                .join(" · ")}
+              <span className="muted"> · Game code {session.code}</span>
+            </p>
+          )}
           <p>
             Read the scenario together. Make room for everyone’s ideas before
             choosing an answer.
@@ -305,9 +341,11 @@ export function Game({
             >
               One more adventure <ArrowRight size={17} />
             </Link>
-            <Link className="btn secondary" href="/parent">
-              View parent summary
-            </Link>
+            {family?.household?.role !== "member" && !family?.locked && (
+              <Link className="btn secondary" href="/parent">
+                View parent summary
+              </Link>
+            )}
           </div>
         </section>
       ) : current ? (
@@ -433,6 +471,9 @@ export function Game({
       ) : (
         <p role="status">Refreshing your saved session…</p>
       )}
+      {c.mode === "world" &&
+        session.state === "complete" &&
+        !session.practice && <GlobalCompare session={session.id} />}
       {answers.length > 0 && (
         <section className="answer-history">
           <h2>Your thinking trail</h2>

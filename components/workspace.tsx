@@ -8,6 +8,7 @@ import {
   Globe2,
   Home,
   Landmark,
+  Lock,
   LogOut,
   RefreshCw,
   Settings2,
@@ -26,6 +27,7 @@ import {
 } from "react";
 import { Brand } from "./brand";
 import { ConsentBanner } from "./consent-banner";
+import { UnlockButton } from "./explorer-mode";
 const avatar: Record<string, string> = {
   fox: "🦊",
   panda: "🐼",
@@ -76,14 +78,25 @@ export function Workspace({
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [refresh]);
-  const nav = [
-    ["/home", "Home", Home],
-    ["/challenges", "Challenges", Compass],
-    ["/world", "World", Globe2],
-    ["/safezone", "SafeZone", Landmark],
-    ["/passport", "Passport", BookOpen],
-    ["/family", "Family", Users],
-  ] as const;
+  // Family members host and play; guardian-only areas are left out of their nav
+  // (and refused by the pages and the server).
+  const member = data?.household?.role === "member";
+  // Explorer mode: only play areas are offered (the server refuses the rest).
+  const locked = Boolean(data?.locked);
+  const nav = (
+    [
+      ["/home", "Home", Home],
+      ["/challenges", "Challenges", Compass],
+      ["/world", "World", Globe2],
+      ["/safezone", "SafeZone", Landmark],
+      ["/passport", "Passport", BookOpen],
+      ["/family", "Family", Users],
+    ] as const
+  ).filter(
+    ([href]) =>
+      !(member && href === "/safezone") &&
+      !(locked && ["/safezone", "/family"].includes(href)),
+  );
   return (
     <Context.Provider value={{ data, error, refresh }}>
       <div className="workspace">
@@ -110,13 +123,15 @@ export function Workspace({
             ))}
           </nav>
           <div className="sidebar-bottom">
-            <Link
-              href="/parent"
-              className={path === "/parent" ? "selected" : ""}
-            >
-              <ShieldCheck size={20} /> Parent Hub
-            </Link>
-            {data?.admin && (
+            {!member && !locked && (
+              <Link
+                href="/parent"
+                className={path === "/parent" ? "selected" : ""}
+              >
+                <ShieldCheck size={20} /> Parent Hub
+              </Link>
+            )}
+            {data?.admin && !locked && (
               <Link href="/admin">
                 <Settings2 size={20} /> Content & safety
               </Link>
@@ -129,18 +144,22 @@ export function Workspace({
               </strong>
               <p>Make your next game night a family thing.</p>
             </div>
-            <button
-              className="logout"
-              onClick={async () => {
-                const r = await fetch("/api/snapshot", { method: "DELETE" });
-                if (r.ok) {
-                  router.push("/login");
-                  router.refresh();
-                } else setError("Could not sign out. Please try again.");
-              }}
-            >
-              <LogOut size={16} /> Sign out
-            </button>
+            {locked ? (
+              <UnlockButton />
+            ) : (
+              <button
+                className="logout"
+                onClick={async () => {
+                  const r = await fetch("/api/snapshot", { method: "DELETE" });
+                  if (r.ok) {
+                    router.push("/login");
+                    router.refresh();
+                  } else setError("Could not sign out. Please try again.");
+                }}
+              >
+                <LogOut size={16} /> Sign out
+              </button>
+            )}
           </div>
         </aside>
         <div className="workspace-body">
@@ -149,9 +168,19 @@ export function Workspace({
               <span className="live-dot" /> Your family’s space
             </span>
             <div>
-              <Link href="/parent" className="guardian-pill">
-                <ShieldCheck size={14} /> Parent Hub
-              </Link>
+              {locked ? (
+                <span className="guardian-pill explorer-pill">
+                  <Lock size={14} /> Explorer mode
+                </span>
+              ) : member ? (
+                <span className="guardian-pill">
+                  <Users size={14} /> {data?.household?.displayName}
+                </span>
+              ) : (
+                <Link href="/parent" className="guardian-pill">
+                  <ShieldCheck size={14} /> Parent Hub
+                </Link>
+              )}
               <span className="profile-icon">
                 {data?.household?.name.slice(0, 1) || "Q"}
               </span>

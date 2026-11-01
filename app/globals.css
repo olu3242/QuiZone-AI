@@ -3938,3 +3938,208 @@ input[type="radio"] {
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
+/* QZ-31: family members and multi-device play */
+.members-panel {
+  margin-top: 30px;
+}
+.members-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.members-panel h3 {
+  font-size: 15px;
+  margin: 18px 0 8px;
+}
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0;
+  display: grid;
+  gap: 8px;
+}
+.member-list li,
+.member-explorers li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.member-list li .btn {
+  margin-left: auto;
+}
+.member-explorers {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.invite-code {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f1f4ff;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.invite-code code {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #1d2433;
+}
+.lobby .devices {
+  font-size: 13px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+/* QZ-32: Explorer mode */
+.explorer-lock-card {
+  margin-bottom: 18px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #f4f1ff;
+}
+.explorer-lock-card h3 {
+  margin: 8px 0 6px;
+}
+.explorer-lock-card p {
+  font-size: 13px;
+  color: #3f4656;
+  margin-bottom: 12px;
+}
+.explorer-pill {
+  background: #ece6ff;
+  color: #3b2a8f;
+}
+.explorer-hero {
+  padding: 32px 28px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #2a1f7a, #4b3bd1);
+  color: #fff;
+  margin-bottom: 28px;
+}
+.explorer-hero .eyebrow {
+  color: #e4defe;
+}
+.explorer-hero h1 {
+  color: #fff;
+  font-size: clamp(28px, 6vw, 44px);
+  margin: 6px 0;
+}
+.explorer-hero p {
+  color: #f1eeff;
+}
+.explorer-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  justify-content: center;
+}
+.explorer-hero .explorer-actions {
+  justify-content: flex-start;
+}
+.explorer-hero .btn.secondary {
+  background: #fff;
+  color: #2a1f7a;
+}
+.explorer-subtitle {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+.explorer-crew {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.explorer-crew li {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 18px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: #fff;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.explorer-crew li span:last-child {
+  font-size: 12px;
+  color: #3f4656;
+}
+.explorer-avatar {
+  font-size: 40px;
+}
+.explorer-continue {
+  display: grid;
+  gap: 10px;
+}
+/* QZ-33: Global Connect */
+.global-compare {
+  margin: 24px 0;
+}
+.global-compare h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-step {
+  margin-top: 18px;
+}
+.compare-step h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.compare-step ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.compare-step li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 140px) 44px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+.compare-label {
+  overflow-wrap: anywhere;
+}
+.compare-you {
+  color: #3b2a8f;
+}
+.compare-bar {
+  height: 10px;
+  border-radius: 99px;
+  background: #e8ebf3;
+  overflow: hidden;
+}
+.compare-bar span {
+  display: block;
+  height: 100%;
+  background: #4b3bd1;
+}
+.compare-pct {
+  text-align: right;
+  font-weight: 700;
+}
+/* QZ-34: Q authoring suggestions */
+.q-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: -4px 0 12px;
+  font-size: 12px;
+}

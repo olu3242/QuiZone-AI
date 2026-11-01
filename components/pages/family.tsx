@@ -1,16 +1,31 @@
 "use client";
+import { ExplorerLocked } from "../explorer-mode";
 import { ArrowRight, Plus, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 import { AccountPrivacy } from "../account-privacy";
 import { ChildFields, childPayload, ExplorerCard } from "../explorer-card";
 import { Feedback, Heading } from "../family-ui";
+import { JoinHousehold, MemberFamily, MembersPanel } from "../family-members";
 import { command, useFamily } from "../workspace";
 export function FamilyPage() {
   const { data, refresh } = useFamily();
   const [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
+  if (data.household?.role === "member")
+    return (
+      <>
+        <Heading
+          eyebrow="YOUR PEOPLE. YOUR PLACE."
+          title={data.household.name}
+          description="You joined this family on the guardian’s invitation."
+        />
+        <MemberFamily data={data} />
+        <AccountPrivacy householdName={null} member />
+      </>
+    );
   const active = data.children.filter((c) => !c.archived_at),
     archived = data.children.filter((c) => c.archived_at);
   async function saved(note: string) {
@@ -103,6 +118,9 @@ export function FamilyPage() {
             </button>
           </form>
         </section>
+      ) : null}
+      {!data.household ? (
+        <JoinHousehold />
       ) : (
         <div className="content-split">
           <section>
@@ -240,6 +258,7 @@ export function FamilyPage() {
           </aside>
         </div>
       )}
+      {data.household && <MembersPanel data={data} />}
       <AccountPrivacy householdName={data.household?.name ?? null} />
     </>
   );

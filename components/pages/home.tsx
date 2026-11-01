@@ -1,4 +1,5 @@
 "use client";
+import { ExplorerHome, LockCard } from "../explorer-mode";
 import { levelFor } from "@/lib/progress";
 import {
   ArrowRight,
@@ -33,6 +34,7 @@ export function HomePage() {
         <NeedHousehold />
       </>
     );
+  if (data.locked) return <ExplorerHome data={data} />;
   const completed = data.sessions.filter((s) => s.state === "complete");
   const xp = data.scores.reduce((a, s) => a + s.points, 0);
   return (
@@ -179,17 +181,20 @@ export function HomePage() {
               Manage family <ArrowRight size={15} />
             </Link>
           </div>
-          <div className="parent-nudge">
-            <ShieldCheck />
-            <h3>A little insight for grown-ups</h3>
-            <p>
-              See what your family practiced, and find a question for your next
-              conversation.
-            </p>
-            <Link href="/parent">
-              Open Parent Hub <ArrowRight size={15} />
-            </Link>
-          </div>
+          <LockCard />
+          {data.household?.role !== "member" && (
+            <div className="parent-nudge">
+              <ShieldCheck />
+              <h3>A little insight for grown-ups</h3>
+              <p>
+                See what your family practiced, and find a question for your
+                next conversation.
+              </p>
+              <Link href="/parent">
+                Open Parent Hub <ArrowRight size={15} />
+              </Link>
+            </div>
+          )}
         </aside>
       </div>
     </>

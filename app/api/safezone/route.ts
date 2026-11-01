@@ -1,3 +1,4 @@
+import { explorerLocked, LOCKED_MESSAGE } from "@/lib/household";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { ownsChild } from "@/lib/authorize";
@@ -15,6 +16,11 @@ const fail = (error: string, status = 400) =>
 export async function GET(req: NextRequest) {
   try {
     const { db } = await guardian();
+    if (await explorerLocked(db))
+      return NextResponse.json(
+        { error: LOCKED_MESSAGE },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
     const hall = req.nextUrl.searchParams.get("hall");
     if (!hall) {
       const { data, error } = await db.rpc("qz_safezone_lobby");
@@ -59,6 +65,11 @@ export async function POST(req: NextRequest) {
   if (!parsed.success)
     return fail(parsed.error.issues.map((i) => i.message).join(" "));
   const { db, user } = session;
+  if (await explorerLocked(db))
+    return NextResponse.json(
+      { error: LOCKED_MESSAGE },
+      { status: 403, headers: { "Cache-Control": "no-store" } },
+    );
   const input = parsed.data;
   // Password checks are brute-forceable: spend the guardian's reauth budget first.
   const budget = await db.rpc("qz_rate", { bucket: "reauth" });

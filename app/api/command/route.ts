@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     );
   try {
-    const { db, user } = await guardian();
+    const { db } = await guardian();
     if (Number(req.headers.get("content-length") || 0) > 16000)
       return NextResponse.json(
         { error: "Request too large." },
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
         { error: body.error.issues.map((x) => x.message).join(" ") },
         { status: 400 },
       );
-    await authorize(db, user.id, body.data);
+    await authorize(db, body.data);
     const { data, error } = await db.rpc("qz_command", {
       command: body.data.action,
       payload: body.data.data,

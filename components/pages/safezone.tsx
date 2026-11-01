@@ -1,4 +1,6 @@
 "use client";
+import { ExplorerLocked } from "../explorer-mode";
+import { GuardianOnly } from "../family-members";
 import { safezone } from "@/lib/content";
 import type { Child, Hall, SafeZoneLobby } from "@/lib/types";
 import {
@@ -53,6 +55,9 @@ export function SafeZonePage() {
     setMessage(note);
   };
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
+  if (data.household?.role === "member")
+    return <GuardianOnly what="SafeZone" />;
   const heading = (
     <Heading
       eyebrow={safezone.tagline.toUpperCase()}

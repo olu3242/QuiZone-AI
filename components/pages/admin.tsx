@@ -1,4 +1,5 @@
 "use client";
+import { ExplorerLocked } from "../explorer-mode";
 import { difficulties, subjects, zones } from "@/lib/content";
 import type { AppAction } from "@/lib/validation";
 import { Plus } from "lucide-react";
@@ -13,6 +14,7 @@ export function AdminPage() {
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
   if (!data.admin)
     return (
       <Empty

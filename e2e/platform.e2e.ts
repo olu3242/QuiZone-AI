@@ -98,6 +98,9 @@ before(async () => {
   );
 });
 after(async () => {
+  operatorSql(
+    "update private.feature_flags set enabled=false where flag='q_live'",
+  );
   // Never leave a newer consent version behind: later suites would be gated.
   operatorSql(
     "update public.households set consent_version=1 where consent_version>1; delete from public.consent_records where version>1; delete from public.consent_versions where version>1",
@@ -160,6 +163,37 @@ test("QZ-22/23: admin drafts a challenge; publish is refused until quality check
     .getByText(/Quality checks pass/)
     .waitFor();
   await scan(adm, "admin-cms-editor");
+  // QZ-34: Q authoring suggestions are off by default, admin-only, and need a server key.
+  const step = operatorSql(
+    `select s.id from public.challenge_steps s join public.challenge_versions v on v.id=s.version_id join public.challenges c on c.id=v.challenge_id where c.title='${TITLE}' order by s.ordinal limit 1`,
+  );
+  const suggest = () =>
+    api(adm, "/api/q/suggest", { method: "POST", body: { step } });
+  assert.equal(
+    await s2.getByRole("button", { name: /Suggest a hint with Q/ }).count(),
+    0,
+  );
+  assert.equal((await suggest()).status, 404);
+  operatorSql(
+    "update private.feature_flags set enabled=true where flag='q_live'",
+  );
+  try {
+    await adm.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await s2.getByRole("button", { name: /Suggest a hint with Q/ }).click();
+    await s2.getByText(/aren’t configured on this server/).waitFor();
+    assert.equal((await suggest()).status, 503);
+    const guardianTry = await api(g, "/api/q/suggest", {
+      method: "POST",
+      body: { step },
+    });
+    assert.equal(guardianTry.status, 403);
+    await scan(adm, "admin-cms-q");
+  } finally {
+    operatorSql(
+      "update private.feature_flags set enabled=false where flag='q_live'",
+    );
+  }
+  await adm.evaluate(() => window.dispatchEvent(new Event("focus")));
   await card()
     .getByRole("button", { name: /Confirm age review & publish/ })
     .click();

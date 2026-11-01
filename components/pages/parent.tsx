@@ -1,4 +1,6 @@
 "use client";
+import { ExplorerLocked } from "../explorer-mode";
+import { GuardianOnly } from "../family-members";
 import { zones } from "@/lib/content";
 import {
   ArrowRight,
@@ -35,7 +37,10 @@ export function ParentPage() {
     [loadingOlder, setLoadingOlder] = useState(false),
     [historyError, setHistoryError] = useState("");
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
   if (!data.household) return <NeedHousehold />;
+  if (data.household.role === "member")
+    return <GuardianOnly what="Parent Hub" />;
   const recent = data.sessions.filter((s) => s.state === "complete");
   const complete = [
     ...recent,
