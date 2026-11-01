@@ -251,6 +251,24 @@ test("5. QuickZone game night: lobby → active → answers → persisted result
   assert.ok(s.body.session.total_score > 0);
 });
 
+test("5b. QuickZone bonuses are server-scored and Play again opens a new lobby", async () => {
+  const s = await api(a, `/api/session?id=${sessionA}`);
+  const sum = (s.body.answers as { points: number }[]).reduce(
+    (t, x) => t + x.points,
+    0,
+  );
+  assert.equal(s.body.session.total_score, sum);
+  await a.getByRole("button", { name: /Play again/ }).click();
+  await a.waitForURL(
+    (u) => u.pathname.startsWith("/play/") && !u.pathname.endsWith(sessionA),
+  );
+  await a.getByRole("button", { name: /Our crew is ready/ }).waitFor();
+  const next = await api(a, `/api/session?id=${a.url().split("/play/")[1]}`);
+  assert.equal(next.body.session.state, "lobby");
+  assert.equal(next.body.players.length, 2);
+  assert.equal(next.body.version.challenge_id, s.body.version.challenge_id);
+});
+
 test("6. client-supplied scores and replays are rejected by the server", async () => {
   const steps = (await api(a, `/api/session?id=${sessionA}`)).body.steps as {
     id: string;
@@ -366,7 +384,7 @@ test("9. guardian data export is complete and scoped", async () => {
     r.body.children.map((c: { nickname: string }) => c.nickname).sort(),
     ["Nova Star", "Pixel"],
   );
-  assert.equal(r.body.sessions.length, 1);
+  assert.equal(r.body.sessions.length, 2); // completed game + rematch lobby
   assert.equal(r.body.answers.length, 3);
   assert.ok(
     r.body.auditTrail.some((e: { action: string }) => e.action === "export"),

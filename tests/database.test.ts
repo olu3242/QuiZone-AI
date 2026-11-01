@@ -252,7 +252,8 @@ test("complete quick journey persists exact-once scores, feedback, and audit tra
     )
   )[0];
   assert.equal(game.state, "complete");
-  assert.equal(game.total_score, 300);
+  // 3 correct × 100 base, +20 speed each (server-timed), streak +10 then +20.
+  assert.equal(game.total_score, 390);
   await assert.rejects(
     () =>
       cmd(A, "answer", {
@@ -267,7 +268,7 @@ test("complete quick journey persists exact-once scores, feedback, and audit tra
     [session],
   );
   assert.equal(scores.length, 1);
-  assert.equal(scores[0].points, 300);
+  assert.equal(scores[0].points, 390);
   assert.ok(
     (
       await rows("select * from public.audit_events where household_id=$1", [

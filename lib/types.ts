@@ -17,6 +17,7 @@ export type Challenge = {
 };
 export type Version = {
   id: string;
+  challenge_id: string;
   status: string;
   scenario: string;
   min_age: number;
@@ -48,6 +49,7 @@ export type Answer = {
   allocation: Record<string, number> | null;
   design: Record<string, boolean> | null;
   points: number;
+  bonus?: number;
   feedback: string;
 };
 export type Snapshot = {

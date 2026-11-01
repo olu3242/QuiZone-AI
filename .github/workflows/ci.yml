@@ -1,9 +1,8 @@
 name: QuiZone verification
 on:
   push:
-    branches: [main, 'work/**']
+    branches: [main, 'work/**', 'claude/**']
   pull_request:
-    branches: [main]
 permissions:
   contents: read
 jobs:

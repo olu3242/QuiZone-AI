@@ -8,7 +8,14 @@ export type GameData = {
   version: Version & { challenges: Challenge };
   steps: Step[];
   answers: Answer[];
-  players: { child_profiles: { nickname: string; avatar: string } }[];
+  players: {
+    child_id: string;
+    child_profiles: {
+      nickname: string;
+      avatar: string;
+      archived_at: string | null;
+    };
+  }[];
 };
 export async function gameData(rawId: string): Promise<GameData> {
   const id = z.string().uuid().parse(rawId);
@@ -44,7 +51,7 @@ export async function gameData(rawId: string): Promise<GameData> {
       .order("created_at"),
     db
       .from("session_players")
-      .select("child_profiles(nickname,avatar)")
+      .select("child_id,child_profiles(nickname,avatar,archived_at)")
       .eq("session_id", id),
   ]);
   if (v.error || s.error || a.error || p.error)

@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Allocation } from "./allocation";
 import { Blueprint } from "./blueprint";
@@ -28,6 +29,7 @@ export function Game({
   initialNow: number;
 }) {
   const { refresh } = useFamily();
+  const router = useRouter();
   const [game, setGame] = useState<GameData | null>(initialData),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -91,6 +93,24 @@ export function Game({
       setBusy(false);
     }
   }
+  async function playAgain() {
+    if (!game) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await command("create", {
+        challenge: game.version.challenge_id,
+        children: game.players
+          .filter((p) => !p.child_profiles.archived_at)
+          .map((p) => p.child_id),
+      });
+      await refresh();
+      router.push("/play/" + r.session);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not start a rematch.");
+      setBusy(false);
+    }
+  }
   if (!game)
     return (
       <div className="empty-state" role="status">
@@ -110,6 +130,9 @@ export function Game({
       </div>
     );
   const { session, version, steps, answers, players } = game,
+    rematch = players
+      .filter((p) => !p.child_profiles.archived_at)
+      .map((p) => p.child_id),
     c = version.challenges,
     z = zones.find((z) => z.mode === c.mode) || zones[0],
     current = steps.find((s) => !answers.some((a) => a.step_id === s.id)),
@@ -258,7 +281,19 @@ export function Game({
             </p>
           </div>
           <div className="button-row">
-            <Link className="btn" href="/challenges">
+            {rematch.length > 0 && (
+              <button
+                className="btn"
+                disabled={busy}
+                onClick={() => void playAgain()}
+              >
+                {busy ? "Setting up…" : "Play again"} <ArrowRight size={17} />
+              </button>
+            )}
+            <Link
+              className={rematch.length ? "btn secondary" : "btn"}
+              href="/challenges"
+            >
               One more adventure <ArrowRight size={17} />
             </Link>
             <Link className="btn secondary" href="/parent">
@@ -389,7 +424,10 @@ export function Game({
                   <Check size={18} />
                 </span>
                 <h3>{steps.find((s) => s.id === a.step_id)?.prompt}</h3>
-                <span className="pill">+{a.points} points</span>
+                <span className="pill">
+                  +{a.points} points
+                  {a.bonus ? ` · includes +${a.bonus} bonus` : ""}
+                </span>
               </div>
               <p>
                 <strong>Your choice:</strong>{" "}
