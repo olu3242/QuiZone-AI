@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { ownsChild } from "@/lib/authorize";
 import { sameOrigin } from "@/lib/http";
+import { publicError } from "@/lib/errors";
 import { guardian } from "@/lib/supabase";
 import { safezoneConsentSchema } from "@/lib/validation";
 
@@ -25,7 +26,10 @@ export async function GET(req: NextRequest) {
       .safeParse({ hall, child: req.nextUrl.searchParams.get("child") });
     if (!ids.success) return fail("Invalid town hall link.", 404);
     const { data, error } = await db.rpc("qz_safezone_room", ids.data);
-    if (error) return fail(error.message, 403);
+    if (error) {
+      const e = publicError(error, "safezone:room");
+      return fail(e.error, e.status === 400 ? 403 : e.status);
+    }
     return NextResponse.json(data, { headers: noStore });
   } catch (error) {
     return fail(
@@ -56,6 +60,12 @@ export async function POST(req: NextRequest) {
     return fail(parsed.error.issues.map((i) => i.message).join(" "));
   const { db, user } = session;
   const input = parsed.data;
+  // Password checks are brute-forceable: spend the guardian's reauth budget first.
+  const budget = await db.rpc("qz_rate", { bucket: "reauth" });
+  if (budget.error) {
+    const e = publicError(budget.error, "safezone:reauth");
+    return fail(e.error, e.status);
+  }
   const check = await db.auth.signInWithPassword({
     email: user.email!,
     password: input.password,
@@ -80,6 +90,9 @@ export async function POST(req: NextRequest) {
     command: input.action,
     payload: input.data,
   });
-  if (error) return fail(error.message);
+  if (error) {
+    const e = publicError(error, `safezone:${input.action}`);
+    return fail(e.error, e.status);
+  }
   return NextResponse.json(data, { headers: noStore });
 }

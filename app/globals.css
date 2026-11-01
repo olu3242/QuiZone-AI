@@ -83,7 +83,13 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
-summary:focus-visible {
+summary:focus-visible,
+/* Chromium focuses date/time inputs' internal segments (incl. the picker button)
+   without always matching :focus-visible; keep the ring for keyboard users. */
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+input::-webkit-calendar-picker-indicator:focus-visible {
   outline: 3px solid #0b5fff;
   outline-offset: 4px;
 }

@@ -267,6 +267,22 @@ test("6. explorers wait until the moderator opens and starts the room", async ()
     .waitFor({ timeout: 10000 });
 });
 
+test("6b. a dropped room connection shows Reconnecting… and recovers in place", async () => {
+  await a.route("**/api/safezone**", (r) => r.abort("internetdisconnected"));
+  await a
+    .getByText(/Reconnecting… your saved place is kept/)
+    .waitFor({ timeout: 10000 });
+  assert.ok(
+    await a.getByRole("button", { name: /Raise hand/ }).isVisible(),
+    "last good view is kept",
+  );
+  await a.unroute("**/api/safezone**");
+  await a
+    .getByText(/Reconnecting…/)
+    .waitFor({ state: "detached", timeout: 10000 });
+  assert.ok(await a.getByRole("button", { name: /Raise hand/ }).isVisible());
+});
+
 test("7. raise hand → moderator grants the turn → statement shared → held for approval → visible to peers by session name only", async () => {
   await mod
     .locator(".sz-agenda li", { hasText: "What makes students feel safe?" })
@@ -412,10 +428,11 @@ test("12. idea support, completion, and a privacy-safe summary", async () => {
     .waitFor();
 });
 
-test("13. responsive and accessible: lobby, room, and console at 390px and desktop", async () => {
+test("13. responsive and accessible: lobby, room, and console at 390 / 1024 / 1280", async () => {
   const report: Record<string, unknown> = {};
   for (const [width, height] of [
     [390, 844],
+    [1024, 768],
     [1280, 800],
   ]) {
     for (const [page, path] of [
@@ -438,6 +455,74 @@ test("13. responsive and accessible: lobby, room, and console at 390px and deskt
     }
   }
   assert.deepEqual(report, {}, JSON.stringify(report, null, 1));
+});
+
+test("13b. keyboard: every Tab stop in the moderator console is visible and focus is never lost", async () => {
+  await mod.setViewportSize({ width: 1280, height: 800 });
+  await mod.goto(`${BASE}/safezone`);
+  await mod.getByText("Moderator console").waitFor();
+  const stops: {
+    tag: string;
+    label: string;
+    visible: boolean;
+    native: boolean;
+  }[] = [];
+  for (let i = 0; i < 45; i++) {
+    await mod.keyboard.press("Tab");
+    stops.push(
+      await mod.evaluate(() => {
+        const el = document.activeElement as HTMLElement;
+        const cs = getComputedStyle(el);
+        return {
+          tag: el.tagName,
+          label: (
+            el.getAttribute("aria-label") ||
+            el.textContent ||
+            (el as HTMLInputElement).name ||
+            ""
+          )
+            .trim()
+            .slice(0, 40),
+          visible: cs.outlineStyle !== "none" || cs.boxShadow !== "none",
+          // Focus inside a native control's UA shadow DOM (e.g. Chromium's date
+          // picker button) leaves activeElement on the host without :focus; that
+          // ring is drawn by the browser and cannot be measured from the page.
+          native: el.tagName !== "BODY" && !el.matches(":focus"),
+        };
+      }),
+    );
+  }
+  // <body> may appear only where Tab wraps past the end of the page, and the next
+  // stop must be the skip link again: that is document wrap, not lost focus.
+  const trace = stops.map((st, i) => `${i}:${st.tag}:${st.label}`).join(" | ");
+  assert.equal(
+    stops[0].label,
+    "Skip to content",
+    "skip link is the first stop",
+  );
+  assert.ok(
+    stops.every(
+      (st, i) =>
+        st.tag !== "BODY" ||
+        (i > 0 && stops[i + 1]?.label === "Skip to content"),
+    ),
+    "focus was lost mid-page: " + trace,
+  );
+  const hidden = stops.filter(
+    (st) => st.tag !== "BODY" && !st.native && !st.visible,
+  );
+  assert.ok(
+    stops.filter((st) => st.native).length <= 1,
+    "only the date picker button is a UA-internal stop",
+  );
+  assert.deepEqual(hidden, [], "focus indicator missing");
+  assert.ok(
+    new Set(stops.map((st) => st.tag + st.label)).size > 15,
+    "focus advances (no trap)",
+  );
+  // Form controls are reachable and operable by keyboard.
+  assert.ok(stops.some((st) => st.tag === "INPUT"));
+  assert.ok(stops.some((st) => st.tag === "SELECT"));
 });
 
 test("14. withdrawing consent removes the explorer's contributions from the record", async () => {

@@ -115,7 +115,7 @@ export function SafeZonePage() {
           {lobby.staff ? " Moderators can prepare town halls below." : ""}
         </div>
       )}
-      {lobby.enabled && !data.household && <NeedHousehold />}
+      {lobby.enabled && !data.household && !lobby.staff && <NeedHousehold />}
       {lobby.enabled && data.household && (
         <div className="content-split">
           <section>

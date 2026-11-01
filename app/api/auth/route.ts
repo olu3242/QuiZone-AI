@@ -63,9 +63,23 @@ export async function POST(req: NextRequest) {
         message: "If this email has an account, a reset link is on its way.",
       });
     }
-    const { data } = await db.auth.getUser();
-    if (!data.user || !v.password)
-      throw new Error("Open a valid password reset link first.");
+    // Only a session minted by an emailed recovery link, within 15 minutes, may set a
+    // new password without the current one. Verified JWT claims, not cookies' say-so.
+    const { data: claims } = await db.auth.getClaims();
+    const amr = (claims?.claims?.amr ?? []) as {
+      method?: string;
+      timestamp?: number;
+    }[];
+    const recovered = amr.some(
+      (a) =>
+        a.method === "recovery" &&
+        typeof a.timestamp === "number" &&
+        Date.now() / 1000 - a.timestamp <= 900,
+    );
+    if (!recovered || !v.password)
+      throw new Error(
+        "Open a fresh password reset link from your email first. To change a known password, use Account & privacy.",
+      );
     const { error } = await db.auth.updateUser({ password: v.password });
     if (error)
       throw new Error(

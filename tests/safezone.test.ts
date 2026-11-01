@@ -634,6 +634,42 @@ test("emergency closure cancels the hall, escalates an urgent incident, and noti
   );
 });
 
+test("deleting one explorer erases their SafeZone contributions, votes, hands, and registrations", async () => {
+  const before = await h.one<{ c: number; v: number }>(
+    "select (select count(*)::int from public.town_hall_contributions where child_id=$1) c, (select count(*)::int from public.town_hall_votes where child_id=$1) v",
+    [kidA],
+  );
+  assert.ok(
+    before.c > 0 && before.v > 0,
+    "fixture has SafeZone activity to delete",
+  );
+  const summaryBefore = (await room(MOD, null)).summary.contributions;
+  await h.cmd(A, "child_delete", { child: kidA, confirm: "Nova" });
+  for (const table of [
+    "town_hall_registrations",
+    "town_hall_votes",
+    "town_hall_contributions",
+    "town_hall_hands",
+    "safezone_notifications",
+  ])
+    assert.equal(
+      Number(
+        (
+          await h.one<{ n: string }>(
+            `select count(*) n from public.${table} where child_id=$1`,
+            [kidA],
+          )
+        ).n,
+      ),
+      0,
+      table,
+    );
+  assert.ok(
+    (await room(MOD, null)).summary.contributions < summaryBefore,
+    "summary no longer counts them",
+  );
+});
+
 test("account deletion cascades through SafeZone rows without orphans", async () => {
   await h.cmd(B, "account_delete", { confirm: "Crew B" });
   for (const table of [

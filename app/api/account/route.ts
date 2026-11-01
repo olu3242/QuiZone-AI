@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { guardian } from "@/lib/supabase";
 import { sameOrigin } from "@/lib/http";
+import { publicError } from "@/lib/errors";
 import { accountSchema } from "@/lib/validation";
 
 const noStore = { "Cache-Control": "private, no-store" };
@@ -17,6 +18,11 @@ export async function GET() {
       .eq("guardian_id", user.id)
       .single();
     if (error || !house) return fail("Create a household first.", 404);
+    const budget = await db.rpc("qz_rate", { bucket: "export" });
+    if (budget.error) {
+      const e = publicError(budget.error, "account:export");
+      return fail(e.error, e.status);
+    }
     const audit = await db.rpc("qz_command", {
       command: "export",
       payload: {},
@@ -159,6 +165,11 @@ export async function POST(req: NextRequest) {
   const input = parsed.data;
   if (input.action === "change-password") {
     // Re-verify the current password so a borrowed, signed-in device can't take over.
+    const budget = await db.rpc("qz_rate", { bucket: "reauth" });
+    if (budget.error) {
+      const e = publicError(budget.error, "account:reauth");
+      return fail(e.error, e.status);
+    }
     const check = await db.auth.signInWithPassword({
       email: user.email!,
       password: input.current,
@@ -183,7 +194,10 @@ export async function POST(req: NextRequest) {
     command: "account_delete",
     payload: { confirm: input.confirm },
   });
-  if (error) return fail(error.message);
+  if (error) {
+    const e = publicError(error, "account:delete");
+    return fail(e.error, e.status);
+  }
   // The identity no longer exists; clear this device's cookies regardless of API outcome.
   await db.auth.signOut({ scope: "local" }).catch(() => undefined);
   return NextResponse.json({ redirect: "/" }, { headers: noStore });
