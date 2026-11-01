@@ -1,26 +1,40 @@
 # QuiZone AI — E2E results (latest run)
 
-**Run:** 2026-11-01, QZ-31–34. Fresh `supabase db reset --local` with all 18 migrations. Production build of the branch. Chromium (Playwright 1.63.0) and axe-core 4.10.3. Synthetic accounts only. Method and reproduction: `QUIZONE_E2E_CERTIFICATION.md`.
+**Run:** 2026-11-01, QZ-39. Fresh `supabase db reset --local` with all 22 migrations (pg_cron active). Production build of the branch. Chromium (Playwright 1.63.0) and axe-core 4.10.3. Synthetic accounts only. Method and reproduction: `QUIZONE_E2E_CERTIFICATION.md`. Traceability: `QUIZONE_SCENARIOS.md` (101 scenarios, validated by `tests/scenarios.test.ts`).
 
-| Suite                                              | Pass              | Fail | Skip | Blocked                             |
-| -------------------------------------------------- | ----------------- | ---- | ---- | ----------------------------------- |
-| Unit + PGlite DB (`npm test`, 21 files)            | **135**           | 0    | 0    | 0                                   |
-| Browser: explorer (`e2e/explorer`, QZ-32)          | **7**             | 0    | 0    | 0                                   |
-| Browser: family (`e2e/family-journey`)             | **17**            | 0    | 0    | 0                                   |
-| Browser: global (`e2e/global`, QZ-33)              | **5**             | 0    | 0    | 0                                   |
-| Browser: members (`e2e/members`, QZ-31)            | **7**             | 0    | 0    | 0                                   |
-| Browser: platform (`e2e/platform`, QZ-21–29 + 34)  | **11**            | 0    | 0    | 0                                   |
-| Browser: resilience (`e2e/resilience`)             | **7**             | 0    | 0    | 0                                   |
-| Browser: SafeZone (`e2e/safezone-journey`)         | **18**            | 0    | 0    | 0                                   |
-| Browser: zones (`e2e/zones`)                       | **10**            | 0    | 0    | 0                                   |
-| **Browser total**                                  | **82**            | 0    | 0    | 0                                   |
-| plpgsql_check (`supabase db lint --level error`)   | 0 errors          |      |      |                                     |
-| `npm audit` (full tree, incl. `@anthropic-ai/sdk`) | 0 vulnerabilities |      |      |                                     |
-| Hosted UAT                                         | 0                 | 0    | 0    | **all** (no authorized environment) |
+| Suite                                             | Pass              | Fail | Skip | Blocked                             |
+| ------------------------------------------------- | ----------------- | ---- | ---- | ----------------------------------- |
+| Unit + PGlite DB (`npm test`, 26 files)           | **153**           | 0    | 0    | 0                                   |
+| Browser: automation (`e2e/automation`, QZ-35–38)  | **7**             | 0    | 0    | 0                                   |
+| Browser: explorer (`e2e/explorer`, QZ-32)         | **7**             | 0    | 0    | 0                                   |
+| Browser: family (`e2e/family-journey`)            | **17**            | 0    | 0    | 0                                   |
+| Browser: global (`e2e/global`, QZ-33)             | **5**             | 0    | 0    | 0                                   |
+| Browser: members (`e2e/members`, QZ-31)           | **7**             | 0    | 0    | 0                                   |
+| Browser: platform (`e2e/platform`, QZ-21–29 + 34) | **11**            | 0    | 0    | 0                                   |
+| Browser: resilience (`e2e/resilience`)            | **7**             | 0    | 0    | 0                                   |
+| Browser: SafeZone (`e2e/safezone-journey`)        | **18**            | 0    | 0    | 0                                   |
+| Browser: workflows (`e2e/workflows`, QZ-39)       | **8**             | 0    | 0    | 0                                   |
+| Browser: zones (`e2e/zones`)                      | **10**            | 0    | 0    | 0                                   |
+| **Browser total**                                 | **97**            | 0    | 0    | 0                                   |
+| plpgsql_check (`supabase db lint --level error`)  | 0 errors          |      |      |                                     |
+| `npm audit` (full tree)                           | 0 vulnerabilities |      |      |                                     |
+| Hosted UAT                                        | 0                 | 0    | 0    | **all** (no authorized environment) |
 
-New DB/unit files: family-members 10 · explorer-mode 6 · global-connect 4 · q-provider 4 (the Messages API is a local stand-in: no key, no network, no spend). Rollback covers all 17 post-pilot migrations.
+After the run the shared database is left clean: consent at version 1; `safezone` and `q_live` off; `global_compare` on; no paused workflows and no dead letters; the automation suite retires its CMS challenges.
 
-After the full run the shared database is left clean: consent at version 1; `safezone` and `q_live` off; `global_compare` on (suites restore all three in `after()`); the Global Connect suite deletes its five synthetic households through the normal account-deletion path.
+## QZ-35–39 suites
+
+| Suite      | Journey                                                                                                                                                                                                                                                                                                                                                                                                                  | Result |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| automation | A1 CMS authors a 13–17 challenge in Solve/Build/Debate/World (World needs a country, set in the CMS); too-young explorers refused in each · A2 archived explorers refused in each; a CMS debate challenge plays end to end · A3 inbox: badge and report-review notices, mark read, nav badge clears · A4 admin runs maintenance: stale game expires, reminder reaches the inbox once · A5 portfolio shows a saved design | PASS   |
+| workflows  | W1 console lists all 7 workflows · W2 a game runs `badge.notify` end to end with a step log · W3 pause queues runs, resume + tick delivers · W4 dead-letter retry from the console · W5 guardians refused · W6 a real pg_cron tick succeeds on the stack                                                                                                                                                                 | PASS   |
+| all        | axe WCAG 2.2 AA + no overflow at 390 and 1280 on every new surface; no uncaught console errors                                                                                                                                                                                                                                                                                                                           | PASS   |
+
+## Defects found and fixed (QZ-35–39)
+
+- The CMS couldn't set a WorldZone country, so every CMS-authored WorldZone challenge failed the quality gate. Added `cms_country` (admin, audited).
+- `.nav-badge` inherited the link grey (3.76:1); it failed AA once the Parent Hub unread badge appeared. Explicit colour now.
+- Two suites looked challenges up by mode only and broke once CMS content existed in that mode; pinned by title. The automation suite now retires its own content.
 
 ## QZ-31–34 suites
 
