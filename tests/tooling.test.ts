@@ -60,6 +60,29 @@ test("Next lint resolver uses the scoped adapter and preserves directory discove
   }
 });
 
+test("ESLint toolchain resolves the patched minimatch facade in both call shapes", () => {
+  const facade = require("../tools/minimatch-compat/index.cjs");
+  const patchedVersion = require("minimatch-patched/package.json").version;
+  assert.equal(patchedVersion.split(".")[0], "11");
+  for (const consumer of [
+    "eslint",
+    "@eslint/config-array",
+    "eslint-plugin-import",
+    "eslint-plugin-react",
+    "eslint-plugin-jsx-a11y",
+    "@typescript-eslint/typescript-estree",
+  ]) {
+    const consumerRequire = createRequire(require.resolve(consumer));
+    assert.equal(consumerRequire("minimatch"), facade, consumer);
+  }
+  assert.equal(facade("app/page.tsx", "app/**/*.tsx"), true);
+  assert.equal(facade("lib/a.ts", "app/**"), false);
+  assert.equal(facade.minimatch("a/b.ts", "a/*.ts"), true);
+  assert.equal(new facade.Minimatch("**/*.tsx").match("x/y.tsx"), true);
+  assert.equal(facade.default, facade);
+  assert.deepEqual(facade.braceExpand("{a,b}"), ["a", "b"]);
+});
+
 test("Next, React hook, and accessibility lint rules still reject invalid components", async () => {
   const lint = new ESLint({ cwd: process.cwd() });
   const results = await lint.lintText(
