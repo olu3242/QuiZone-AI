@@ -23,7 +23,6 @@ const fn = async (sig: string) =>
   ).r !== null;
 const down = (file: string) =>
   h.db.exec(readFileSync("supabase/rollback/" + file, "utf8"));
-const downNamed = (name: string) => down(downs.find((f) => f.includes(name))!);
 const up = (file: string) =>
   h.db.exec(readFileSync("supabase/migrations/" + file, "utf8"));
 
@@ -46,36 +45,49 @@ test("every post-pilot migration has a matching down script", () => {
   assert.deepEqual([...post].sort(), [...downs].sort());
 });
 
-test("stepwise rollback leaves a working schema at every stage", async () => {
-  // zone flags → kill switches gone, zones still playable
-  await downNamed("_zone_flags");
-  assert.equal(await fn("public.qz_flags()"), false);
-  // hardening → rate limiting gone, router still serves SafeZone
-  await downNamed("_hardening");
-  assert.equal(await exists("private.rate_events"), false);
-  assert.equal(await fn("public.qz_rate(text)"), false);
-  await assert.rejects(
-    () => h.cmd(G, "sz_permission", { enabled: true }),
-    /not open yet/,
-  );
-  // safezone → tables, flag, and router branch gone
-  await downNamed("_safezone");
-  for (const t of [
-    "public.town_halls",
-    "public.town_hall_votes",
-    "private.feature_flags",
-  ])
-    assert.equal(await exists(t), false, t);
-  await assert.rejects(
-    () => h.cmd(G, "sz_permission", { enabled: true }),
-    /Unknown command/,
-  );
-  // quickzone scoring → triggers removed; QuickZone still scores base points
-  await downNamed("_quickzone_scoring");
-  assert.equal(await fn("private.quick_bonus()"), false);
-  // family controls → original router; data-rights commands no longer exist
-  await downNamed("_family_controls");
-  await assert.rejects(() => h.cmd(G, "export", {}), /Unknown command/);
+// Checks that must hold right after each named migration is rolled back.
+const afterDown: Record<string, () => Promise<void>> = {
+  _content_meta: async () => {
+    assert.equal(await fn("private.cms_command(text,jsonb)"), false);
+    await assert.rejects(
+      () => h.cmd(G, "cms_meta", {}),
+      /Unknown command|administrator/,
+    );
+  },
+  _zone_flags: async () => assert.equal(await fn("public.qz_flags()"), false),
+  _hardening: async () => {
+    assert.equal(await exists("private.rate_events"), false);
+    assert.equal(await fn("public.qz_rate(text)"), false);
+    await assert.rejects(
+      () => h.cmd(G, "sz_permission", { enabled: true }),
+      /not open yet/,
+    );
+  },
+  _safezone: async () => {
+    for (const t of [
+      "public.town_halls",
+      "public.town_hall_votes",
+      "private.feature_flags",
+    ])
+      assert.equal(await exists(t), false, t);
+    await assert.rejects(
+      () => h.cmd(G, "sz_permission", { enabled: true }),
+      /Unknown command/,
+    );
+  },
+  _quickzone_scoring: async () =>
+    assert.equal(await fn("private.quick_bonus()"), false),
+  _family_controls: async () => {
+    await assert.rejects(() => h.cmd(G, "export", {}), /Unknown command/);
+  },
+};
+
+test("stepwise rollback (newest first) leaves a working schema at every stage", async () => {
+  for (const f of downs) {
+    await down(f);
+    const key = Object.keys(afterDown).find((k) => f.includes(k));
+    if (key) await afterDown[key]();
+  }
   // The pilot itself still works, with the data created before rollback intact.
   await h.cmd(G, "child", {
     nickname: "Pilot",
@@ -93,6 +105,15 @@ test("stepwise rollback leaves a working schema at every stage", async () => {
     ),
     2,
   );
+});
+
+test("every down script has a stage check", () => {
+  for (const f of downs)
+    assert.ok(
+      Object.keys(afterDown).some((k) => f.includes(k)) ||
+        f.includes("_family_controls"),
+      `add an afterDown check for ${f}`,
+    );
 });
 
 test("roll forward re-applies cleanly and every feature works again", async () => {

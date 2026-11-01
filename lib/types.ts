@@ -13,6 +13,8 @@ export type Challenge = {
   description: string;
   minutes: number;
   country: string | null;
+  subject: string;
+  difficulty: string;
   versions: Version[];
 };
 export type Version = {

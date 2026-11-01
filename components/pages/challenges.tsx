@@ -1,5 +1,5 @@
 "use client";
-import { zoneOpen, zones } from "@/lib/content";
+import { difficulties, subjects, zoneOpen, zones } from "@/lib/content";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +21,8 @@ export function ChallengesPage({
   const router = useRouter();
   const { data, refresh } = useFamily();
   const [filter, setFilter] = useState("all"),
+    [subject, setSubject] = useState("all"),
+    [level, setLevel] = useState("all"),
     [selected, setSelected] = useState(initialSelected),
     [players, setPlayers] = useState<string[]>([]),
     [error, setError] = useState(""),
@@ -73,9 +75,38 @@ export function ChallengesPage({
           </button>
         ))}
       </div>
+      <div className="filter-selects">
+        <label>
+          Subject
+          <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+            <option value="all">All subjects</option>
+            {Object.entries(subjects).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Difficulty
+          <select value={level} onChange={(e) => setLevel(e.target.value)}>
+            <option value="all">Any difficulty</option>
+            {Object.entries(difficulties).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="challenge-grid">
         {eligible
-          .filter((c) => filter === "all" || c.mode === filter)
+          .filter(
+            (c) =>
+              (filter === "all" || c.mode === filter) &&
+              (subject === "all" || c.subject === subject) &&
+              (level === "all" || c.difficulty === level),
+          )
           .map((c) => (
             <div key={c.id}>
               <ChallengeCard challenge={c} />

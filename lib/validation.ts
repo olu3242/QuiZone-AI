@@ -216,6 +216,22 @@ export const actionSchema = z.discriminatedUnion("action", [
     }),
   }),
   z.object({
+    action: z.literal("cms_meta"),
+    data: z.object({
+      challenge: z.string().uuid(),
+      subject: z.enum([
+        "science",
+        "math",
+        "environment",
+        "civics",
+        "world",
+        "creativity",
+        "general",
+      ]),
+      difficulty: z.enum(["starter", "explorer", "challenger"]),
+    }),
+  }),
+  z.object({
     action: z.literal("child_archive"),
     data: z.object({ child: z.string().uuid(), archived: z.boolean() }),
   }),
@@ -340,6 +356,7 @@ export const safezoneConsentSchema = z.discriminatedUnion("action", [
     }),
   }),
 ]);
+export const adminActions = ["cms_meta"] as const;
 export const moderatorActions = [
   "sz_hall_create",
   "sz_hall_state",

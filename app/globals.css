@@ -3747,3 +3747,27 @@ input[type="radio"] {
 .sz-agenda li.current small {
   color: #4b5262;
 }
+
+/* QZ-21 content metadata */
+.challenge-meta {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4b5262;
+  margin: 4px 0 8px;
+}
+.filter-selects,
+.meta-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin: 0 0 22px;
+}
+.filter-selects label,
+.meta-editor label {
+  font-size: 12px;
+  min-width: 160px;
+}
+.meta-editor {
+  margin: 10px 0;
+}

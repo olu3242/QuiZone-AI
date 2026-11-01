@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import "server-only";
-import { moderatorActions, type AppAction } from "./validation";
+import { adminActions, moderatorActions, type AppAction } from "./validation";
 // Independent API authorization, in addition to RLS and transactional RPC checks.
 export async function authorize(
   db: SupabaseClient,
@@ -12,6 +12,14 @@ export async function authorize(
       required_role: input.action === "review" ? null : "admin",
     });
     if (error || !data) throw new Error("Staff permission is required.");
+    return;
+  }
+  if ((adminActions as readonly string[]).includes(input.action)) {
+    const { data, error } = await db.rpc("qz_is_staff", {
+      required_role: "admin",
+    });
+    if (error || !data)
+      throw new Error("Content tools require an administrator role.");
     return;
   }
   if ((moderatorActions as readonly string[]).includes(input.action)) {

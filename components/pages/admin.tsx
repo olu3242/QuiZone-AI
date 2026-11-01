@@ -1,5 +1,5 @@
 "use client";
-import { zones } from "@/lib/content";
+import { difficulties, subjects, zones } from "@/lib/content";
 import type { AppAction } from "@/lib/validation";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -46,6 +46,42 @@ export function AdminPage() {
             <article className="panel summary-card" key={c.id}>
               <h3>{c.title}</h3>
               <p>{zoneFor(c.mode).name}</p>
+              <form
+                className="meta-editor"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const f = new FormData(e.currentTarget);
+                  void execute("cms_meta", {
+                    challenge: c.id,
+                    subject: f.get("subject"),
+                    difficulty: f.get("difficulty"),
+                  });
+                }}
+              >
+                <label>
+                  Subject
+                  <select name="subject" defaultValue={c.subject}>
+                    {Object.entries(subjects).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Difficulty
+                  <select name="difficulty" defaultValue={c.difficulty}>
+                    {Object.entries(difficulties).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className="btn small secondary" disabled={busy}>
+                  Save details
+                </button>
+              </form>
               {c.versions.map((v) => (
                 <div className="session-row" key={v.id}>
                   <span>

@@ -121,3 +121,17 @@ export const zoneOpen = (
   flags: Record<string, boolean> | undefined,
   mode: string,
 ) => flags?.["zone_" + mode] !== false;
+export const subjects: Record<string, string> = {
+  science: "Science",
+  math: "Math",
+  environment: "Environment",
+  civics: "Civics",
+  world: "The world",
+  creativity: "Creativity",
+  general: "General",
+};
+export const difficulties: Record<string, string> = {
+  starter: "Starter",
+  explorer: "Explorer",
+  challenger: "Challenger",
+};
