@@ -189,6 +189,47 @@ export function FamilyPage() {
                 Save family preferences
               </button>
             </form>
+            <form
+              className="q-budget"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const limit = Number(
+                  new FormData(e.currentTarget).get("limit"),
+                );
+                setBusy(true);
+                setMessage("");
+                command("q_budget", { limit })
+                  .then(() => refresh())
+                  .then(() => setMessage("Daily hint limit saved."))
+                  .catch((err) =>
+                    setMessage(
+                      err instanceof Error ? err.message : "Could not save.",
+                    ),
+                  )
+                  .finally(() => setBusy(false));
+              }}
+            >
+              <label>
+                Q hints per day (whole family)
+                <input
+                  type="number"
+                  name="limit"
+                  min={1}
+                  max={50}
+                  required
+                  defaultValue={data.permissions?.q_daily_limit ?? 20}
+                />
+              </label>
+              {data.qUsage && (
+                <p className="muted">
+                  Used {data.qUsage.used} of {data.qUsage.limit} in the last 24
+                  hours.
+                </p>
+              )}
+              <button className="btn secondary small" disabled={busy}>
+                Save hint limit
+              </button>
+            </form>
             <div className="quiet-note">
               <ShieldCheck size={18} />
               <p>

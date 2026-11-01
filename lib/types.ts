@@ -58,7 +58,13 @@ export type Answer = {
 export type Snapshot = {
   household: { id: string; name: string } | null;
   children: Child[];
-  permissions: { world: boolean; q: boolean; minutes: number } | null;
+  permissions: {
+    world: boolean;
+    q: boolean;
+    minutes: number;
+    q_daily_limit?: number;
+  } | null;
+  qUsage: { used: number; limit: number } | null;
   challenges: Challenge[];
   sessions: Session[];
   scores: {

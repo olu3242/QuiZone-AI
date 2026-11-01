@@ -277,6 +277,10 @@ export const actionSchema = z.discriminatedUnion("action", [
     data: z.object({ version: z.string().uuid() }),
   }),
   z.object({
+    action: z.literal("q_budget"),
+    data: z.object({ limit: z.number().int().min(1).max(50) }),
+  }),
+  z.object({
     action: z.literal("consent_accept"),
     data: z.object({ version: z.number().int().min(1) }),
   }),

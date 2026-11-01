@@ -209,6 +209,9 @@ export function ParentPage() {
           <p className="muted">
             Q currently uses reviewed, prewritten hints, rather than a live AI
             model.
+            {data.qUsage
+              ? ` ${data.qUsage.used} of ${data.qUsage.limit} daily hints used in the last 24 hours.`
+              : ""}
           </p>
           {data.qLogs.length ? (
             data.qLogs.map((q) => (

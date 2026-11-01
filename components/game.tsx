@@ -79,6 +79,7 @@ export function Game({
           "Your report is saved for review. Follow its status in Parent Hub.",
         );
       await load();
+      if (action === "hint") await refresh();
       if (action === "answer" || action === "plan" || action === "blueprint") {
         setChoice(null);
         setHint("");
@@ -415,6 +416,12 @@ export function Game({
               >
                 <Sparkles size={16} /> Ask for a hint
               </button>
+              {family?.qUsage && !hintsPaused && (
+                <small>
+                  {family.qUsage.used} of {family.qUsage.limit} family hints
+                  used today.
+                </small>
+              )}
               <small>
                 {hintsPaused
                   ? "Hints are paused right now."

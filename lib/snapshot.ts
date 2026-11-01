@@ -17,6 +17,7 @@ export async function snapshot(): Promise<Snapshot> {
   // Operator kill switches; a missing map means "all on" for older databases.
   const { data: flags } = await db.rpc("qz_flags");
   const { data: consent } = await db.rpc("qz_consent_status");
+  const { data: qUsage } = await db.rpc("qz_q_usage");
   const hid = h.data?.id;
   const results = await Promise.all([
     db.from("challenges").select("*,versions:challenge_versions(*)"),
@@ -115,6 +116,7 @@ export async function snapshot(): Promise<Snapshot> {
     admin: Boolean(staff),
     flags: (flags as Record<string, boolean> | null) ?? {},
     consent: (consent as Snapshot["consent"]) ?? null,
+    qUsage: (qUsage as Snapshot["qUsage"]) ?? null,
     badges: catalog.data ?? [],
     childBadges: earned.data ?? [],
     familyBadges: family.data ?? [],
