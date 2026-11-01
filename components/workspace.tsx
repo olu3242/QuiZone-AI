@@ -25,6 +25,7 @@ import {
   type ReactNode,
 } from "react";
 import { Brand } from "./brand";
+import { ConsentBanner } from "./consent-banner";
 const avatar: Record<string, string> = {
   fox: "🦊",
   panda: "🐼",
@@ -172,7 +173,10 @@ export function Workspace({
                 <h2>Getting your family’s space ready…</h2>
               </div>
             ) : (
-              children
+              <>
+                <ConsentBanner />
+                {children}
+              </>
             )}
           </main>
           <footer className="workspace-footer">

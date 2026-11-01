@@ -244,6 +244,29 @@ export function ParentPage() {
             </div>
           )}
           <SafeZoneGuardianSummary explorers={data.children} />
+          <div className="mini-heading">
+            <h2>Consent history</h2>
+          </div>
+          {data.consent?.history.length ? (
+            data.consent.history.map((r) => (
+              <div className="session-row" key={r.version}>
+                <ShieldCheck size={18} />
+                <div>
+                  <strong>Consent version {r.version}</strong>
+                  <small>
+                    Accepted {new Date(r.acceptedAt).toLocaleString()}
+                  </small>
+                </div>
+                <span className="status">
+                  {r.version === data.consent?.current
+                    ? "current"
+                    : "superseded"}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="simple-empty">No consent recorded yet.</div>
+          )}
         </section>
         <aside>
           <section className="panel form-panel">

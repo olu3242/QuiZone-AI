@@ -73,6 +73,13 @@ export type Snapshot = {
   qLogs: { id: string; output: string; created_at: string }[];
   admin: boolean;
   flags: Record<string, boolean>;
+  consent: {
+    current: number;
+    accepted: number;
+    pending: boolean;
+    text: { summary: string; body: string } | null;
+    history: { version: number; acceptedAt: string }[];
+  } | null;
   badges: {
     code: string;
     scope: string;

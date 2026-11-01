@@ -47,6 +47,8 @@ test("every post-pilot migration has a matching down script", () => {
 
 // Checks that must hold right after each named migration is rolled back.
 const afterDown: Record<string, () => Promise<void>> = {
+  _consent_versions: async () =>
+    assert.equal(await exists("public.consent_records"), false),
   _practice: async () =>
     assert.equal(await fn("private.mark_practice(uuid)"), false),
   _badges: async () => assert.equal(await exists("public.child_badges"), false),

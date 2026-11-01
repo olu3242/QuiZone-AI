@@ -3872,3 +3872,27 @@ input[type="radio"] {
   font-size: 11px;
   margin-top: 8px;
 }
+
+/* QZ-27 consent banner */
+.consent-banner {
+  border: 1px solid #f2c94c;
+  background: #fffaeb;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+.consent-banner h2 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.consent-banner p {
+  font-size: 13px;
+  color: #4b3a00;
+}
+.consent-banner details {
+  margin: 10px 0 14px;
+  font-size: 13px;
+}

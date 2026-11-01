@@ -142,7 +142,12 @@ export async function GET() {
         .eq("household_id", hid)
         .order("created_at"),
     ]);
-    const [childBadges, familyBadges] = await Promise.all([
+    const [childBadges, familyBadges, consents] = await Promise.all([
+      db
+        .from("consent_records")
+        .select("version,accepted_at")
+        .eq("household_id", hid)
+        .order("version"),
       db
         .from("child_badges")
         .select("child_id,badge_code,awarded_at")
@@ -161,6 +166,7 @@ export async function GET() {
         szNotes,
         childBadges,
         familyBadges,
+        consents,
       ].some((p) => p.error)
     )
       return fail("Could not prepare your export.");
@@ -182,6 +188,7 @@ export async function GET() {
       guidedHints: hints.data,
       auditTrail: events.data,
       badges: { children: childBadges.data, family: familyBadges.data },
+      consentRecords: consents.data,
       safezone: {
         townHallRegistrations: szRegs.data,
         contributions: szSaid.data,
