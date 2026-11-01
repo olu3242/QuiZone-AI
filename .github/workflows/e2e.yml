@@ -18,6 +18,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: psql --version
       - run: npx playwright install --with-deps chromium
       # Local Supabase stack: real Postgres, GoTrue Auth, PostgREST, Mailpit.
       # Uses the CLI's public local-only keys; no repository secrets are needed.
@@ -34,6 +35,8 @@ jobs:
           echo "E2E_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
           echo "E2E_SUPABASE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
           echo "E2E_MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+          # SafeZone suite performs operator-only SQL (staff grant, feature flag).
+          echo "E2E_DB_URL=$DB_URL" >> "$GITHUB_ENV"
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: '1'

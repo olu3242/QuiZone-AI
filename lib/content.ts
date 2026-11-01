@@ -80,3 +80,39 @@ export const faqs = [
     "No. QuiZone is about time together and practicing skills through play. Progress reflects activity, not a measure of intelligence.",
   ],
 ];
+export const safezone = {
+  tagline: "Your Voice. Your Ideas. A Safer World.",
+  categories: {
+    school: "School",
+    community: "Community",
+    environment: "Environment",
+    technology: "Technology",
+    future: "The future",
+    family: "Family",
+  } as Record<string, string>,
+  rules: [
+    "Every town hall is led by a trained adult moderator.",
+    "Explorers appear with a fun session name — never their real name.",
+    "Everyone shares by choosing idea and statement cards. There is no chat.",
+    "A moderator checks every contribution before others see it.",
+    "Guardians approve each town hall and can withdraw at any time.",
+    "Anyone can report a concern. Moderators can pause or close a session.",
+  ],
+  consent:
+    "I am this explorer’s guardian. I consent to them joining this moderated town hall under a session name, choosing pre-written cards, and voting in polls. I understand their contributions are reviewed before others see them, and that I can withdraw consent at any time, which removes their contributions and votes.",
+  states: {
+    draft: "Draft",
+    scheduled: "Registration open",
+    open: "Room open",
+    active: "Live now",
+    completed: "Completed",
+    cancelled: "Closed",
+  } as Record<string, string>,
+  reportReasons: {
+    bullying: "Unkind or bullying",
+    unsafe: "Feels unsafe",
+    privacy: "Shares private details",
+    inappropriate: "Not appropriate",
+    technical: "Something isn’t working",
+  } as Record<string, string>,
+};

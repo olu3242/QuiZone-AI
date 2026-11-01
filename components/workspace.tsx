@@ -7,6 +7,7 @@ import {
   Flag,
   Globe2,
   Home,
+  Landmark,
   LogOut,
   RefreshCw,
   Settings2,
@@ -78,6 +79,7 @@ export function Workspace({
     ["/home", "Home", Home],
     ["/challenges", "Challenges", Compass],
     ["/world", "World", Globe2],
+    ["/safezone", "SafeZone", Landmark],
     ["/passport", "Passport", BookOpen],
     ["/family", "Family", Users],
   ] as const;

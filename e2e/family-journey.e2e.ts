@@ -435,14 +435,17 @@ test("11. accessibility: no critical/serious WCAG 2.2 AA violations on key pages
     "/passport",
     "/world",
     `/play/${sessionA}`,
-  ]) {
-    await a.goto(BASE + path);
-    await a.waitForLoadState("networkidle");
-    const v = (await axe(a))!.filter(
-      (x) => x.impact === "critical" || x.impact === "serious",
-    );
-    if (v.length) report[path] = v;
-  }
+  ])
+    for (const width of [390, 1280]) {
+      await a.setViewportSize({ width, height: 844 });
+      await a.goto(BASE + path);
+      await a.waitForLoadState("networkidle");
+      const v = (await axe(a))!.filter(
+        (x) => x.impact === "critical" || x.impact === "serious",
+      );
+      if (v.length) report[`${path}@${width}`] = v;
+    }
+  await a.setViewportSize({ width: 1280, height: 800 });
   assert.deepEqual(report, {}, JSON.stringify(report, null, 1));
 });
 

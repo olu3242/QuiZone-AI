@@ -65,6 +65,156 @@ export const actionSchema = z.discriminatedUnion("action", [
     action: z.literal("child_update"),
     data: childSchema.extend({ child: z.string().uuid() }),
   }),
+  // ---- SafeZone (structured, moderator-authored cards only; no free text from children)
+  z.object({
+    action: z.literal("sz_hall_create"),
+    data: z.object({
+      title: z.string().trim().min(6).max(100),
+      summary: z.string().trim().min(20).max(500),
+      category: z.enum([
+        "school",
+        "community",
+        "environment",
+        "technology",
+        "future",
+        "family",
+      ]),
+      minAge: z.number().int().min(8).max(17),
+      maxAge: z.number().int().min(8).max(17),
+      capacity: z.number().int().min(2).max(30),
+      startsAt: z.string().datetime(),
+      duration: z.number().int().min(15).max(90),
+      moderator: z.string().uuid().optional(),
+      agenda: z
+        .array(
+          z.object({
+            title: z.string().trim().min(3).max(120),
+            minutes: z.number().int().min(1).max(60),
+          }),
+        )
+        .min(1)
+        .max(10),
+      options: z
+        .array(
+          z.object({
+            kind: z.enum(["contribution", "question", "idea"]),
+            agenda: z.number().int().min(1).max(10).optional(),
+            text: z.string().trim().min(3).max(200),
+          }),
+        )
+        .min(1)
+        .max(60),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_hall_state"),
+    data: z.object({
+      hall: z.string().uuid(),
+      state: z.enum(["scheduled", "open", "active", "completed", "cancelled"]),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_agenda"),
+    data: z.object({
+      hall: z.string().uuid(),
+      item: z.number().int().min(1).max(10),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_turn"),
+    data: z.object({
+      hall: z.string().uuid(),
+      hand: z.string().uuid().nullable(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_review"),
+    data: z.object({ contribution: z.string().uuid(), approve: z.boolean() }),
+  }),
+  z.object({
+    action: z.literal("sz_poll_create"),
+    data: z.object({
+      hall: z.string().uuid(),
+      question: z.string().trim().min(6).max(200),
+      options: z.array(z.string().trim().min(1).max(120)).min(2).max(6),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_poll_state"),
+    data: z.object({
+      poll: z.string().uuid(),
+      state: z.enum(["open", "closed"]),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_remove"),
+    data: z.object({
+      hall: z.string().uuid(),
+      handle: z.string().min(3).max(40),
+      reason: z.string().trim().min(3).max(300),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_emergency_close"),
+    data: z.object({
+      hall: z.string().uuid(),
+      reason: z.string().trim().min(3).max(300),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_report_review"),
+    data: z.object({
+      report: z.string().uuid(),
+      status: z.enum(["under_review", "actioned", "dismissed", "escalated"]),
+      note: z.string().trim().max(500).optional(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_permission"),
+    data: z.object({ enabled: z.literal(false) }),
+  }),
+  z.object({
+    action: z.literal("sz_withdraw"),
+    data: z.object({ hall: z.string().uuid(), child: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("sz_hand"),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      raised: z.boolean(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_say"),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      option: z.string().uuid(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_vote"),
+    data: z.object({
+      poll: z.string().uuid(),
+      child: z.string().uuid(),
+      choice: z.number().int().min(0).max(5),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_report"),
+    data: z.object({
+      hall: z.string().uuid(),
+      reason: z.enum([
+        "bullying",
+        "unsafe",
+        "privacy",
+        "inappropriate",
+        "technical",
+      ]),
+      contribution: z.string().uuid().optional(),
+    }),
+  }),
   z.object({
     action: z.literal("child_archive"),
     data: z.object({ child: z.string().uuid(), archived: z.boolean() }),
@@ -172,6 +322,36 @@ export const accountSchema = z.discriminatedUnion("action", [
   }),
 ]);
 export type AccountAction = z.infer<typeof accountSchema>;
+// Consent-granting SafeZone actions require the guardian's password in the same
+// request; the database independently checks the fresh-password JWT claim.
+export const safezoneConsentSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("sz_permission"),
+    password: z.string().min(1).max(128),
+    data: z.object({ enabled: z.literal(true) }),
+  }),
+  z.object({
+    action: z.literal("sz_register"),
+    password: z.string().min(1).max(128),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      consent: z.literal(true),
+    }),
+  }),
+]);
+export const moderatorActions = [
+  "sz_hall_create",
+  "sz_hall_state",
+  "sz_agenda",
+  "sz_turn",
+  "sz_review",
+  "sz_poll_create",
+  "sz_poll_state",
+  "sz_remove",
+  "sz_emergency_close",
+  "sz_report_review",
+] as const;
 export function safeNext(value: string | null) {
   return value?.startsWith("/") &&
     !value.startsWith("//") &&

@@ -71,3 +71,122 @@ export type Snapshot = {
   admin: boolean;
   cases: { id: string; reason: string; status: string; created_at: string }[];
 };
+
+// ---- SafeZone (shapes returned by qz_safezone_lobby / qz_safezone_room)
+export type HallState =
+  "draft" | "scheduled" | "open" | "active" | "completed" | "cancelled";
+export type AgendaItem = { ordinal: number; title: string; minutes: number };
+export type Hall = {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+  minAge: number;
+  maxAge: number;
+  capacity: number;
+  startsAt: string;
+  duration: number;
+  state: HallState;
+  closedReason: string | null;
+  mine: boolean;
+  registered: number;
+  agenda: AgendaItem[] | null;
+};
+export type Registration = {
+  hall: string;
+  child: string;
+  handle: string;
+  status: "registered" | "withdrawn" | "removed";
+  consentedAt: string;
+  withdrawnAt: string | null;
+  removedReason: string | null;
+};
+export type SafeZoneLobby = {
+  enabled: boolean;
+  staff: boolean;
+  permission: boolean;
+  halls: Hall[];
+  registrations: Registration[];
+  notifications: {
+    id: string;
+    kind: string;
+    message: string;
+    createdAt: string;
+  }[];
+  reports: {
+    id: string;
+    hall: string;
+    reason: string;
+    severity?: string;
+    status: string;
+    handle?: string | null;
+    createdAt: string;
+    events?: { status: string; note: string | null; at: string }[];
+  }[];
+};
+export type CardOption = {
+  id: string;
+  kind: "contribution" | "question" | "idea";
+  text: string;
+  agenda: number | null;
+};
+export type Poll = {
+  id: string;
+  question: string;
+  options: string[];
+  state: "draft" | "open" | "closed";
+  votes: number;
+  results: number[] | null;
+};
+export type Room = {
+  serverNow: string;
+  moderator: boolean;
+  hall: {
+    id: string;
+    title: string;
+    summary?: string;
+    state: HallState;
+    currentItem?: number;
+    startsAt?: string;
+    duration?: number;
+    closedReason?: string | null;
+    minAge?: number;
+    maxAge?: number;
+  };
+  agenda?: AgendaItem[];
+  options?: CardOption[];
+  me: {
+    status: Registration["status"];
+    handle: string;
+    removedReason?: string | null;
+    hand?: "waiting" | "speaking" | null;
+    shared?: { option: string; status: string }[];
+    votes?: Record<string, number>;
+  } | null;
+  participants?: number;
+  queue?: { hand: string | null; handle: string; state: string }[];
+  feed?: {
+    id: string;
+    kind: CardOption["kind"];
+    text: string;
+    agenda: number | null;
+    handle: string | null;
+    at: string;
+  }[];
+  pending?:
+    | {
+        id: string;
+        kind: string;
+        text: string;
+        handle: string;
+        at: string;
+      }[]
+    | null;
+  roster?: { handle: string; status: string }[] | null;
+  polls?: Poll[];
+  summary?: {
+    participants: number;
+    contributions: number;
+    ideas: { text: string; supporters: number }[];
+  } | null;
+};

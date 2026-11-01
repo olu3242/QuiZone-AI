@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import "server-only";
-import type { AppAction } from "./validation";
+import { moderatorActions, type AppAction } from "./validation";
 // Independent API authorization, in addition to RLS and transactional RPC checks.
 export async function authorize(
   db: SupabaseClient,
@@ -14,6 +14,14 @@ export async function authorize(
     if (error || !data) throw new Error("Staff permission is required.");
     return;
   }
+  if ((moderatorActions as readonly string[]).includes(input.action)) {
+    const { data, error } = await db.rpc("qz_is_staff", {
+      required_role: null,
+    });
+    if (error || !data)
+      throw new Error("A SafeZone moderator role is required.");
+    return;
+  }
   if (input.action === "household") return;
   const { data: house, error } = await db
     .from("households")
@@ -21,16 +29,7 @@ export async function authorize(
     .eq("guardian_id", userId)
     .single();
   if (error || !house) throw new Error("Create a guardian household first.");
-  if ("child" in input.data) {
-    const { data: child, error } = await db
-      .from("child_profiles")
-      .select("id")
-      .eq("id", input.data.child)
-      .eq("household_id", house.id)
-      .single();
-    if (error || !child)
-      throw new Error("Explorer not found or permission denied.");
-  }
+  if ("child" in input.data) await ownsChild(db, house.id, input.data.child);
   if ("session" in input.data) {
     const { data: session, error } = await db
       .from("game_sessions")
@@ -82,4 +81,19 @@ export async function authorize(
     if (mode === "world" && !permissions?.world)
       throw new Error("A guardian must enable WorldZone first.");
   }
+}
+
+export async function ownsChild(
+  db: SupabaseClient,
+  householdId: string,
+  childId: string,
+) {
+  const { data: child, error } = await db
+    .from("child_profiles")
+    .select("id")
+    .eq("id", childId)
+    .eq("household_id", householdId)
+    .single();
+  if (error || !child)
+    throw new Error("Explorer not found or permission denied.");
 }
