@@ -38,7 +38,7 @@ end$$;
 revoke all on function private.purge_sessions(uuid[]) from public, anon, authenticated;
 
 create function private.family_command(command text, payload jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
-declare uid uuid:=auth.uid(); hid uuid; hname text; c public.child_profiles; ref uuid; result jsonb:='{}'; sids uuid[]; n_children int:=0; n_sessions int:=0; n_cases int:=0;
+declare uid uuid:=auth.uid(); hid uuid; hname text; c public.child_profiles; ref uuid; result jsonb:='{}'::jsonb; sids uuid[]; n_children int:=0; n_sessions int:=0; n_cases int:=0;
 begin
  if uid is null or not exists(select 1 from auth.users where id=uid and email_confirmed_at is not null) then raise exception 'A confirmed guardian account is required';end if;
  if payload is null or jsonb_typeof(payload)<>'object' then raise exception 'Invalid command payload';end if;

@@ -13,7 +13,8 @@
     "test:db": "node --import tsx --test tests/database.test.ts",
     "prebuild": "node scripts/generate-brand.mjs",
     "predev": "node scripts/generate-brand.mjs",
-    "audit": "npm audit --audit-level=low"
+    "audit": "npm audit --audit-level=low",
+    "test:e2e": "node --import tsx --test --test-concurrency=1 e2e/*.e2e.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
@@ -30,16 +31,18 @@
     "@types/node": "20.14.15",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
+    "axe-core": "4.10.3",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.3",
+    "fast-glob": "file:tools/next-lint-glob",
+    "minimatch": "file:tools/minimatch-compat",
+    "playwright": "1.63.0",
     "postcss": "8.5.28",
     "prettier": "3.9.10",
     "supabase": "2.121.0",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.15",
-    "typescript": "5.5.4",
-    "fast-glob": "file:tools/next-lint-glob",
-    "minimatch": "file:tools/minimatch-compat"
+    "typescript": "5.5.4"
   },
   "engines": {
     "node": ">=22.0.0"
