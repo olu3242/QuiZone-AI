@@ -1,5 +1,11 @@
 "use client";
-import { zones } from "@/lib/content";
+import {
+  difficulties,
+  practiceCopy,
+  subjects,
+  zoneOpen,
+  zones,
+} from "@/lib/content";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,11 +27,15 @@ export function ChallengesPage({
   const router = useRouter();
   const { data, refresh } = useFamily();
   const [filter, setFilter] = useState("all"),
+    [subject, setSubject] = useState("all"),
+    [level, setLevel] = useState("all"),
+    [practice, setPractice] = useState(false),
     [selected, setSelected] = useState(initialSelected),
     [players, setPlayers] = useState<string[]>([]),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  const crew = data.children.filter((c) => !c.archived_at);
   const eligible = data.challenges.filter((c) =>
     c.versions.some((v) => v.status === "published"),
   );
@@ -37,6 +47,7 @@ export function ChallengesPage({
       const result = await command("create", {
         challenge: selected,
         children: players,
+        ...(practice ? { practice: true } : {}),
       });
       await refresh();
       router.push("/play/" + result.session);
@@ -72,21 +83,57 @@ export function ChallengesPage({
           </button>
         ))}
       </div>
+      <div className="filter-selects">
+        <label>
+          Subject
+          <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+            <option value="all">All subjects</option>
+            {Object.entries(subjects).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Difficulty
+          <select value={level} onChange={(e) => setLevel(e.target.value)}>
+            <option value="all">Any difficulty</option>
+            {Object.entries(difficulties).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="challenge-grid">
         {eligible
-          .filter((c) => filter === "all" || c.mode === filter)
+          .filter(
+            (c) =>
+              (filter === "all" || c.mode === filter) &&
+              (subject === "all" || c.subject === subject) &&
+              (level === "all" || c.difficulty === level),
+          )
           .map((c) => (
             <div key={c.id}>
               <ChallengeCard challenge={c} />
               <button
                 className="btn secondary full"
+                disabled={!zoneOpen(data.flags, c.mode)}
                 onClick={() => {
                   setSelected(c.id);
-                  setPlayers(data.children.map((c) => c.id));
+                  setPlayers(crew.map((c) => c.id));
                   setError("");
                 }}
               >
-                Choose this adventure <ArrowRight size={16} />
+                {zoneOpen(data.flags, c.mode) ? (
+                  <>
+                    Choose this adventure <ArrowRight size={16} />
+                  </>
+                ) : (
+                  "Paused for now"
+                )}
               </button>
             </div>
           ))}
@@ -115,7 +162,7 @@ export function ChallengesPage({
             </p>
             {!data.household ? (
               <NeedHousehold />
-            ) : !data.children.length ? (
+            ) : !crew.length ? (
               <Empty
                 title="Add your first explorer."
                 description="Create a family profile before playing."
@@ -124,7 +171,7 @@ export function ChallengesPage({
               />
             ) : (
               <>
-                {data.children.map((c) => (
+                {crew.map((c) => (
                   <label className="player-choice" key={c.id}>
                     <input
                       type="checkbox"
@@ -141,6 +188,14 @@ export function ChallengesPage({
                     <strong>{c.nickname}</strong>
                   </label>
                 ))}
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    checked={practice}
+                    onChange={(e) => setPractice(e.target.checked)}
+                  />
+                  {practiceCopy.option}
+                </label>
                 <p className="muted">
                   Your family’s session limit: {data.permissions?.minutes}{" "}
                   minutes.

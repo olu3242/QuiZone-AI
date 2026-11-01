@@ -1,5 +1,5 @@
 "use client";
-import { zones } from "@/lib/content";
+import { difficulties, subjects, zones } from "@/lib/content";
 import type { Challenge, Session, Snapshot } from "@/lib/types";
 import { ArrowRight, Clock3, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -96,6 +96,10 @@ export function ChallengeCard({ challenge }: { challenge: Challenge }) {
         <p className="eyebrow">{z.tag}</p>
         <h3>{challenge.title}</h3>
         <p>{challenge.description}</p>
+        <p className="challenge-meta">
+          {subjects[challenge.subject] ?? challenge.subject} ·{" "}
+          {difficulties[challenge.difficulty] ?? challenge.difficulty}
+        </p>
         <div>
           <span>
             <Clock3 size={14} /> {challenge.minutes} min

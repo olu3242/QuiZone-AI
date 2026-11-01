@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { guardian } from "@/lib/supabase";
 import { sameOrigin } from "@/lib/http";
 import { authorize } from "@/lib/authorize";
+import { publicError } from "@/lib/errors";
 import { actionSchema } from "@/lib/validation";
 export async function POST(req: NextRequest) {
   if (!sameOrigin(req))
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     );
   try {
-    const { db, user } = await guardian();
+    const { db } = await guardian();
     if (Number(req.headers.get("content-length") || 0) > 16000)
       return NextResponse.json(
         { error: "Request too large." },
@@ -22,13 +23,18 @@ export async function POST(req: NextRequest) {
         { error: body.error.issues.map((x) => x.message).join(" ") },
         { status: 400 },
       );
-    await authorize(db, user.id, body.data);
+    await authorize(db, body.data);
     const { data, error } = await db.rpc("qz_command", {
       command: body.data.action,
       payload: body.data.data,
     });
-    if (error)
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      const e = publicError(error, `command:${body.data.action}`);
+      return NextResponse.json(
+        { error: e.error, code: e.code },
+        { status: e.status },
+      );
+    }
     return NextResponse.json(data, {
       headers: { "Cache-Control": "no-store" },
     });

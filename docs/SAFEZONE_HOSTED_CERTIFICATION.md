@@ -1,0 +1,18 @@
+# SafeZone hosted certification (SZ-11 to SZ-20)
+
+**Status: BLOCKED. No hosted test was run, and nothing hosted was modified.**
+
+| Batch                      | Result                      | Evidence (2026-11-01, branch `claude/gracious-bohr-a6k3nv`)                                                                                                                                                            |
+| -------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SZ-11 PR #2 audit          | **PASS**                    | Local head, remote branch, and PR head all matched `59ee8a5` at the start. CI `verify` and `e2e` were green on it. The Vercel preview build was Ready. 62/62 tests were re-run fresh on that code before any change.   |
+| SZ-12 Supabase environment | **BLOCKED**                 | The connector can't read `orjremljufkflomsjelr` ("You do not have permission"). Its only org is "olu3242's Org" (Foundry, MEDLINK, BTG AI). Ownership and intended use are unconfirmed, so the project wasn't touched. |
+| SZ-13 Database readiness   | **PASS (local)**            | Migration order verified (5 files). RLS on every public table. Rollback scripts added and proven down → up on PGlite (`tests/rollback.test.ts`) and on real Supabase Postgres 17. plpgsql_check: 0 errors.             |
+| SZ-14 Authentication       | **PASS (local)**            | Guardian (email confirm, login, recovery, password change, global sign-out); moderator (SQL-granted staff role); explorers have no credentials by design. Reset path now requires a recovery session.                  |
+| SZ-15 Consent              | **PASS (local)**            | Wrong password refused; stale password claim (more than 5 min) refused; consent API without the password route refused; withdrawal erases; disabling SafeZone withdraws everywhere; reauth limited to 10 per 15 min.   |
+| SZ-16 Lifecycle            | **PASS (local)**            | Create → publish → open → start → complete or cancel; registration, turns, cards, polls, summary; reconnection after a dropped connection.                                                                             |
+| SZ-17 Safeguarding         | **PASS (local)**            | Reports with a staff-only decision trail; removal with guardian notice; emergency closure escalates an urgent incident and blocks participation; deleting an explorer erases their contributions and votes.            |
+| SZ-18 Hosted browser E2E   | **BLOCKED**                 | Needs SZ-12. The suite is ready to run against the hosted stack (`SAFEZONE_UAT_TEST_PLAN.md`).                                                                                                                         |
+| SZ-19 UI/UX                | **PASS (local, automated)** | 390 / 1024 / 1280 with no overflow; axe WCAG 2.2 AA shows 0 serious or critical issues; keyboard traversal with visible focus everywhere. A manual screen-reader pass is still open.                                   |
+| SZ-20 Release decision     | **NO-GO for hosted UAT**    | See `SAFEZONE_RELEASE_DECISION.md`.                                                                                                                                                                                    |
+
+To unblock: confirm `orjremljufkflomsjelr` is the QuiZone UAT project (or create an empty one), grant the Supabase connector access to its org, and approve applying the five migrations to it. Then run `SAFEZONE_UAT_TEST_PLAN.md`.

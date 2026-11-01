@@ -62,6 +62,304 @@ export const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("household"), data: householdSchema }),
   z.object({ action: z.literal("child"), data: childSchema }),
   z.object({
+    action: z.literal("child_update"),
+    data: childSchema.extend({ child: z.string().uuid() }),
+  }),
+  // ---- SafeZone (structured, moderator-authored cards only; no free text from children)
+  z.object({
+    action: z.literal("sz_hall_create"),
+    data: z.object({
+      title: z.string().trim().min(6).max(100),
+      summary: z.string().trim().min(20).max(500),
+      category: z.enum([
+        "school",
+        "community",
+        "environment",
+        "technology",
+        "future",
+        "family",
+      ]),
+      minAge: z.number().int().min(8).max(17),
+      maxAge: z.number().int().min(8).max(17),
+      capacity: z.number().int().min(2).max(30),
+      startsAt: z.string().datetime(),
+      duration: z.number().int().min(15).max(90),
+      moderator: z.string().uuid().optional(),
+      agenda: z
+        .array(
+          z.object({
+            title: z.string().trim().min(3).max(120),
+            minutes: z.number().int().min(1).max(60),
+          }),
+        )
+        .min(1)
+        .max(10),
+      options: z
+        .array(
+          z.object({
+            kind: z.enum(["contribution", "question", "idea"]),
+            agenda: z.number().int().min(1).max(10).optional(),
+            text: z.string().trim().min(3).max(200),
+          }),
+        )
+        .min(1)
+        .max(60),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_hall_state"),
+    data: z.object({
+      hall: z.string().uuid(),
+      state: z.enum(["scheduled", "open", "active", "completed", "cancelled"]),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_agenda"),
+    data: z.object({
+      hall: z.string().uuid(),
+      item: z.number().int().min(1).max(10),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_turn"),
+    data: z.object({
+      hall: z.string().uuid(),
+      hand: z.string().uuid().nullable(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_review"),
+    data: z.object({ contribution: z.string().uuid(), approve: z.boolean() }),
+  }),
+  z.object({
+    action: z.literal("sz_poll_create"),
+    data: z.object({
+      hall: z.string().uuid(),
+      question: z.string().trim().min(6).max(200),
+      options: z.array(z.string().trim().min(1).max(120)).min(2).max(6),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_poll_state"),
+    data: z.object({
+      poll: z.string().uuid(),
+      state: z.enum(["open", "closed"]),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_remove"),
+    data: z.object({
+      hall: z.string().uuid(),
+      handle: z.string().min(3).max(40),
+      reason: z.string().trim().min(3).max(300),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_emergency_close"),
+    data: z.object({
+      hall: z.string().uuid(),
+      reason: z.string().trim().min(3).max(300),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_report_review"),
+    data: z.object({
+      report: z.string().uuid(),
+      status: z.enum(["under_review", "actioned", "dismissed", "escalated"]),
+      note: z.string().trim().max(500).optional(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_permission"),
+    data: z.object({ enabled: z.literal(false) }),
+  }),
+  z.object({
+    action: z.literal("sz_withdraw"),
+    data: z.object({ hall: z.string().uuid(), child: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("sz_hand"),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      raised: z.boolean(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_say"),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      option: z.string().uuid(),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_vote"),
+    data: z.object({
+      poll: z.string().uuid(),
+      child: z.string().uuid(),
+      choice: z.number().int().min(0).max(5),
+    }),
+  }),
+  z.object({
+    action: z.literal("sz_report"),
+    data: z.object({
+      hall: z.string().uuid(),
+      reason: z.enum([
+        "bullying",
+        "unsafe",
+        "privacy",
+        "inappropriate",
+        "technical",
+      ]),
+      contribution: z.string().uuid().optional(),
+    }),
+  }),
+  z.object({
+    action: z.literal("cms_meta"),
+    data: z.object({
+      challenge: z.string().uuid(),
+      subject: z.enum([
+        "science",
+        "math",
+        "environment",
+        "civics",
+        "world",
+        "creativity",
+        "general",
+      ]),
+      difficulty: z.enum(["starter", "explorer", "challenger"]),
+    }),
+  }),
+  z.object({
+    action: z.enum(["wf_pause", "wf_resume"]),
+    data: z.object({
+      workflow: z
+        .string()
+        .regex(/^[a-z][a-z0-9_.]{2,60}$/, "Unknown workflow."),
+    }),
+  }),
+  z.object({
+    action: z.literal("wf_retry"),
+    data: z.object({ run: z.number().int().positive() }),
+  }),
+  z.object({ action: z.literal("wf_tick"), data: z.object({}) }),
+  z.object({
+    action: z.literal("cms_country"),
+    data: z.object({
+      challenge: z.string().uuid(),
+      country: z
+        .string()
+        .trim()
+        .regex(
+          /^[A-Za-z][A-Za-z .'-]{1,55}$/,
+          "Enter a country name (letters only).",
+        ),
+    }),
+  }),
+  z.object({
+    action: z.literal("cms_step_add"),
+    data: z
+      .object({
+        prompt: z.string().trim().min(10).max(500),
+        options: z.array(z.string().trim().min(1).max(150)).min(2).max(6),
+        correct: z.number().int().min(0).max(5),
+        hint: z.string().trim().min(10).max(300),
+        explanation: z.string().trim().min(10).max(500),
+      })
+      .extend({ version: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_step_update"),
+    data: z
+      .object({
+        prompt: z.string().trim().min(10).max(500),
+        options: z.array(z.string().trim().min(1).max(150)).min(2).max(6),
+        correct: z.number().int().min(0).max(5),
+        hint: z.string().trim().min(10).max(300),
+        explanation: z.string().trim().min(10).max(500),
+      })
+      .extend({ step: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_step_delete"),
+    data: z.object({ step: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_version_update"),
+    data: z.object({
+      version: z.string().uuid(),
+      scenario: z.string().trim().min(20).max(1000),
+      minAge: z.number().int().min(8).max(17),
+      maxAge: z.number().int().min(8).max(17),
+    }),
+  }),
+  z.object({
+    action: z.literal("cms_version_new"),
+    data: z.object({ challenge: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("cms_version_retire"),
+    data: z.object({ version: z.string().uuid() }),
+  }),
+  z.object({ action: z.literal("member_invite"), data: z.object({}) }),
+  z.object({
+    action: z.literal("member_uninvite"),
+    data: z.object({ invite: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("member_remove"),
+    data: z.object({ member: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("member_join"),
+    data: z.object({
+      code: z
+        .string()
+        .trim()
+        .regex(/^[0-9A-Fa-f -]{12,16}$/, "Enter the 12-character invite code."),
+      displayName: z
+        .string()
+        .trim()
+        .regex(
+          /^[A-Za-z0-9 _-]{2,24}$/,
+          "Use a display name of 2 to 24 letters or numbers.",
+        ),
+    }),
+  }),
+  z.object({ action: z.literal("member_leave"), data: z.object({}) }),
+  z.object({ action: z.literal("explorer_lock"), data: z.object({}) }),
+  z.object({
+    action: z.literal("notice_read"),
+    data: z.union([
+      z.object({ id: z.string().uuid() }),
+      z.object({ all: z.literal(true) }),
+    ]),
+  }),
+  z.object({
+    action: z.literal("presence"),
+    data: z.object({ session: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("q_budget"),
+    data: z.object({ limit: z.number().int().min(1).max(50) }),
+  }),
+  z.object({
+    action: z.literal("consent_accept"),
+    data: z.object({ version: z.number().int().min(1) }),
+  }),
+  z.object({
+    action: z.literal("child_archive"),
+    data: z.object({ child: z.string().uuid(), archived: z.boolean() }),
+  }),
+  z.object({
+    action: z.literal("child_delete"),
+    data: z.object({
+      child: z.string().uuid(),
+      confirm: z.string().min(1).max(50),
+    }),
+  }),
+  z.object({
     action: z.literal("permissions"),
     data: z.object({
       world: z.boolean(),
@@ -74,6 +372,7 @@ export const actionSchema = z.discriminatedUnion("action", [
     data: z.object({
       challenge: z.string().uuid(),
       children: z.array(z.string().uuid()).min(1).max(8),
+      practice: z.boolean().optional(),
     }),
   }),
   z.object({
@@ -138,6 +437,95 @@ export const actionSchema = z.discriminatedUnion("action", [
   }),
 ]);
 export type AppAction = z.infer<typeof actionSchema>;
+const password = z
+  .string()
+  .min(12, "Use at least 12 characters.")
+  .max(128, "Use at most 128 characters.");
+// Account-level operations live outside the gameplay command union so the
+// destructive path has its own route, validation, and session handling.
+export const accountSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("change-password"),
+    current: z.string().min(1).max(128),
+    next: password,
+  }),
+  z.object({ action: z.literal("signout-all") }),
+  z.object({
+    action: z.literal("delete"),
+    confirm: z.string().min(1).max(50),
+  }),
+]);
+export type AccountAction = z.infer<typeof accountSchema>;
+// Consent-granting SafeZone actions require the guardian's password in the same
+// request; the database independently checks the fresh-password JWT claim.
+export const safezoneConsentSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("sz_permission"),
+    password: z.string().min(1).max(128),
+    data: z.object({ enabled: z.literal(true) }),
+  }),
+  z.object({
+    action: z.literal("sz_register"),
+    password: z.string().min(1).max(128),
+    data: z.object({
+      hall: z.string().uuid(),
+      child: z.string().uuid(),
+      consent: z.literal(true),
+    }),
+  }),
+]);
+export const adminActions = [
+  "wf_pause",
+  "wf_resume",
+  "wf_retry",
+  "wf_tick",
+  "cms_meta",
+  "cms_country",
+  "cms_step_add",
+  "cms_step_update",
+  "cms_step_delete",
+  "cms_version_update",
+  "cms_version_new",
+  "cms_version_retire",
+] as const;
+// The only actions an Explorer-mode (locked) session may take: play.
+export const explorerActions = [
+  "create",
+  "transition",
+  "answer",
+  "plan",
+  "blueprint",
+  "hint",
+  "report",
+  "presence",
+  "explorer_lock",
+] as const;
+// Actions only the household's guardian may take (members are refused in the API and the DB).
+export const guardianOnlyActions = [
+  "child",
+  "child_update",
+  "child_archive",
+  "child_delete",
+  "permissions",
+  "q_budget",
+  "consent_accept",
+  "member_invite",
+  "member_uninvite",
+  "member_remove",
+  "notice_read",
+] as const;
+export const moderatorActions = [
+  "sz_hall_create",
+  "sz_hall_state",
+  "sz_agenda",
+  "sz_turn",
+  "sz_review",
+  "sz_poll_create",
+  "sz_poll_state",
+  "sz_remove",
+  "sz_emergency_close",
+  "sz_report_review",
+] as const;
 export function safeNext(value: string | null) {
   return value?.startsWith("/") &&
     !value.startsWith("//") &&

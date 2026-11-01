@@ -40,10 +40,10 @@ before(async () => {
     "insert into auth.users values($1,now()),($2,now()),($3,now()),($4,null)",
     [A, B, STAFF, UNCONFIRMED],
   );
-  const migration = readdirSync("supabase/migrations").find((s) =>
-    s.endsWith("_quizone_pilot.sql"),
-  )!;
-  await db.exec(readFileSync("supabase/migrations/" + migration, "utf8"));
+  for (const migration of readdirSync("supabase/migrations")
+    .filter((s) => s.endsWith(".sql"))
+    .sort())
+    await db.exec(readFileSync("supabase/migrations/" + migration, "utf8"));
   await db.query("insert into private.staff values($1,'admin')", [STAFF]);
 });
 after(async () => {
@@ -252,7 +252,8 @@ test("complete quick journey persists exact-once scores, feedback, and audit tra
     )
   )[0];
   assert.equal(game.state, "complete");
-  assert.equal(game.total_score, 300);
+  // 3 correct × 100 base, +20 speed each (server-timed), streak +10 then +20.
+  assert.equal(game.total_score, 390);
   await assert.rejects(
     () =>
       cmd(A, "answer", {
@@ -267,7 +268,7 @@ test("complete quick journey persists exact-once scores, feedback, and audit tra
     [session],
   );
   assert.equal(scores.length, 1);
-  assert.equal(scores[0].points, 300);
+  assert.equal(scores[0].points, 390);
   assert.ok(
     (
       await rows("select * from public.audit_events where household_id=$1", [

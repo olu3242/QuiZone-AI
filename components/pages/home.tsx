@@ -1,4 +1,6 @@
 "use client";
+import { ExplorerHome, LockCard } from "../explorer-mode";
+import { levelFor } from "@/lib/progress";
 import {
   ArrowRight,
   Compass,
@@ -20,6 +22,7 @@ import { useFamily } from "../workspace";
 export function HomePage() {
   const { data } = useFamily();
   if (!data) return null;
+  const crew = data.children.filter((c) => !c.archived_at);
   if (!data.household)
     return (
       <>
@@ -31,6 +34,7 @@ export function HomePage() {
         <NeedHousehold />
       </>
     );
+  if (data.locked) return <ExplorerHome data={data} />;
   const completed = data.sessions.filter((s) => s.state === "complete");
   const xp = data.scores.reduce((a, s) => a + s.points, 0);
   return (
@@ -151,17 +155,21 @@ export function HomePage() {
         <aside>
           <div className="panel family-mini">
             <h3>Your adventure crew</h3>
-            {data.children.length ? (
-              data.children.map((c) => (
+            {crew.length ? (
+              crew.map((c) => (
                 <div className="crew-row" key={c.id}>
                   <span>{avatar[c.avatar]}</span>
                   <div>
                     <strong>{c.nickname}</strong>
                     <small>
-                      {data.scores
-                        .filter((s) => s.child_id === c.id)
-                        .reduce((a, s) => a + s.points, 0)}{" "}
-                      XP · Family explorer
+                      {(() => {
+                        const lv = levelFor(
+                          data.scores
+                            .filter((s) => s.child_id === c.id)
+                            .reduce((a, s) => a + s.points, 0),
+                        );
+                        return `${lv.xp} XP · ${lv.name}`;
+                      })()}
                     </small>
                   </div>
                 </div>
@@ -173,17 +181,20 @@ export function HomePage() {
               Manage family <ArrowRight size={15} />
             </Link>
           </div>
-          <div className="parent-nudge">
-            <ShieldCheck />
-            <h3>A little insight for grown-ups</h3>
-            <p>
-              See what your family practiced, and find a question for your next
-              conversation.
-            </p>
-            <Link href="/parent">
-              Open Parent Hub <ArrowRight size={15} />
-            </Link>
-          </div>
+          <LockCard />
+          {data.household?.role !== "member" && (
+            <div className="parent-nudge">
+              <ShieldCheck />
+              <h3>A little insight for grown-ups</h3>
+              <p>
+                See what your family practiced, and find a question for your
+                next conversation.
+              </p>
+              <Link href="/parent">
+                Open Parent Hub <ArrowRight size={15} />
+              </Link>
+            </div>
+          )}
         </aside>
       </div>
     </>

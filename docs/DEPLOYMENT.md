@@ -21,15 +21,15 @@ Enable email confirmation. Configure Auth redirect URLs for the exact preview an
 
 ## Vercel settings
 
-| Setting | Value |
-|---|---|
-| Root Directory | Repository root |
-| Framework | Next.js |
-| Install Command | `npm ci` |
-| Build Command | `npm run build` |
-| Output Directory | Default Next.js output |
-| Node.js | 22 or newer supported LTS |
-| Environment | URL, publishable key, canonical origin from `.env.example` |
+| Setting          | Value                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| Root Directory   | Repository root                                            |
+| Framework        | Next.js                                                    |
+| Install Command  | `npm ci`                                                   |
+| Build Command    | `npm run build`                                            |
+| Output Directory | Default Next.js output                                     |
+| Node.js          | 22 or newer supported LTS                                  |
+| Environment      | URL, publishable key, canonical origin from `.env.example` |
 
 Push to the repair branch and inspect its Git-connected preview deployment. The missing `app` error is addressed in this branch, but successful local compilation is not proof that a hosted deployment succeeded.
 

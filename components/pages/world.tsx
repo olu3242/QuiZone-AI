@@ -1,6 +1,7 @@
 "use client";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { zoneOpen } from "@/lib/content";
 
 import { ChallengeCard, Heading } from "../family-ui";
 import { useFamily } from "../workspace";
@@ -26,6 +27,12 @@ export function WorldPage() {
           <p>A different place can spark a whole new way of thinking.</p>
         </div>
       </section>
+      {!zoneOpen(data.flags, "world") && (
+        <div className="notice" role="status">
+          <ShieldCheck size={18} /> WorldZone is paused right now. Saved
+          passport stamps stay safe.
+        </div>
+      )}
       {!data.permissions?.world && (
         <div className="notice">
           <ShieldCheck size={18} /> WorldZone needs a guardian’s permission.{" "}

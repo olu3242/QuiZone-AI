@@ -1,4 +1,7 @@
 "use client";
+import { FamilyInbox } from "../family-inbox";
+import { ExplorerLocked } from "../explorer-mode";
+import { GuardianOnly } from "../family-members";
 import { zones } from "@/lib/content";
 import {
   ArrowRight,
@@ -22,13 +25,53 @@ import {
   zoneFor,
 } from "../family-ui";
 import { command, useFamily } from "../workspace";
+import { SafeZoneGuardianSummary } from "../safezone/guardian-summary";
+import { ProgressPanel } from "../progress-panel";
+import type { Session } from "@/lib/types";
 export function ParentPage() {
   const { data, refresh } = useFamily(),
     [message, setMessage] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [visible, setVisible] = useState(5),
+    [older, setOlder] = useState<Session[]>([]),
+    [olderMore, setOlderMore] = useState(true),
+    [loadingOlder, setLoadingOlder] = useState(false),
+    [historyError, setHistoryError] = useState("");
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
   if (!data.household) return <NeedHousehold />;
-  const complete = data.sessions.filter((s) => s.state === "complete");
+  if (data.household.role === "member")
+    return <GuardianOnly what="Parent Hub" />;
+  const recent = data.sessions.filter((s) => s.state === "complete");
+  const complete = [
+    ...recent,
+    ...older.filter((o) => !recent.some((r) => r.id === o.id)),
+  ];
+  // The snapshot holds the newest 100 sessions; older ones page in from the server.
+  const canLoadOlder = olderMore && data.sessions.length >= 100;
+  async function loadOlder() {
+    const last = complete[complete.length - 1];
+    if (!last) return;
+    setLoadingOlder(true);
+    setHistoryError("");
+    try {
+      const r = await fetch(
+        `/api/history?before=${encodeURIComponent(last.created_at)}`,
+        { cache: "no-store" },
+      );
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error);
+      setOlder((o) => [...o, ...j.sessions]);
+      setOlderMore(j.more);
+      setVisible((v) => v + j.sessions.length);
+    } catch (e) {
+      setHistoryError(
+        e instanceof Error ? e.message : "Could not load older adventures.",
+      );
+    } finally {
+      setLoadingOlder(false);
+    }
+  }
   async function schedule(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
@@ -59,6 +102,7 @@ export function ParentPage() {
           <Settings2 size={16} /> Family preferences
         </Link>
       </Heading>
+      <FamilyInbox data={data} />
       <div className="stats-row">
         <div>
           <ShieldCheck />
@@ -101,7 +145,7 @@ export function ParentPage() {
               label="Choose an adventure"
             />
           ) : (
-            complete.map((s) => {
+            complete.slice(0, visible).map((s) => {
               const c = challengeFor(s, data);
               return (
                 <article className="panel summary-card" key={s.id}>
@@ -116,19 +160,22 @@ export function ParentPage() {
                           s.completed_at || s.created_at,
                         ).toLocaleDateString()}{" "}
                         · {s.total_score} team points
+                        {s.practice ? " · practice round (no XP)" : ""}
                       </small>
                     </div>
                     <Link href={"/play/" + s.id}>Review →</Link>
                   </div>
                   <p>
                     <strong>Practiced:</strong>{" "}
-                    {[
-                      ...new Set(
-                        data.scores
-                          .filter((x) => x.session_id === s.id)
-                          .map((x) => x.skill),
-                      ),
-                    ].join(", ")}
+                    {s.practice
+                      ? "practice round, not recorded as progress"
+                      : [
+                          ...new Set(
+                            data.scores
+                              .filter((x) => x.session_id === s.id)
+                              .map((x) => x.skill),
+                          ),
+                        ].join(", ")}
                   </p>
                   <p className="conversation">
                     <strong>Try asking:</strong> “What made you choose your
@@ -138,12 +185,40 @@ export function ParentPage() {
               );
             })
           )}
+          {historyError && (
+            <p className="notice error" role="alert">
+              {historyError}
+            </p>
+          )}
+          <div className="card-actions history-more">
+            {visible < complete.length && (
+              <button
+                className="btn small secondary"
+                onClick={() => setVisible((v) => v + 5)}
+              >
+                Show more ({complete.length - visible} more)
+              </button>
+            )}
+            {visible >= complete.length && canLoadOlder && (
+              <button
+                className="btn small secondary"
+                disabled={loadingOlder}
+                onClick={() => void loadOlder()}
+              >
+                {loadingOlder ? "Loading…" : "Load older adventures"}
+              </button>
+            )}
+          </div>
+          <ProgressPanel data={data} />
           <div className="mini-heading">
             <h2>Q’s hint history</h2>
           </div>
           <p className="muted">
             Q currently uses reviewed, prewritten hints, rather than a live AI
             model.
+            {data.qUsage
+              ? ` ${data.qUsage.used} of ${data.qUsage.limit} daily hints used in the last 24 hours.`
+              : ""}
           </p>
           {data.qLogs.length ? (
             data.qLogs.map((q) => (
@@ -177,6 +252,30 @@ export function ParentPage() {
               No reports submitted. You can report an issue from any saved game
               session.
             </div>
+          )}
+          <SafeZoneGuardianSummary explorers={data.children} />
+          <div className="mini-heading">
+            <h2>Consent history</h2>
+          </div>
+          {data.consent?.history.length ? (
+            data.consent.history.map((r) => (
+              <div className="session-row" key={r.version}>
+                <ShieldCheck size={18} />
+                <div>
+                  <strong>Consent version {r.version}</strong>
+                  <small>
+                    Accepted {new Date(r.acceptedAt).toLocaleString()}
+                  </small>
+                </div>
+                <span className="status">
+                  {r.version === data.consent?.current
+                    ? "current"
+                    : "superseded"}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="simple-empty">No consent recorded yet.</div>
           )}
         </section>
         <aside>

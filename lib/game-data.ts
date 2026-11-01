@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { guardian } from "./supabase";
+import { actingHousehold } from "./household";
 import type { Answer, Challenge, Session, Step, Version } from "./types";
 export type GameData = {
   serverNow: number;
@@ -8,16 +9,20 @@ export type GameData = {
   version: Version & { challenges: Challenge };
   steps: Step[];
   answers: Answer[];
-  players: { child_profiles: { nickname: string; avatar: string } }[];
+  players: {
+    child_id: string;
+    child_profiles: {
+      nickname: string;
+      avatar: string;
+      archived_at: string | null;
+    };
+  }[];
 };
 export async function gameData(rawId: string): Promise<GameData> {
   const id = z.string().uuid().parse(rawId);
-  const { db, user } = await guardian();
-  const { data: house } = await db
-    .from("households")
-    .select("id")
-    .eq("guardian_id", user.id)
-    .single();
+  const { db } = await guardian();
+  // Guardian or invited family member, on any of their devices.
+  const house = await actingHousehold(db);
   if (!house) throw new Error("Permission denied.");
   const { data: session, error } = await db
     .from("game_sessions")
@@ -44,7 +49,7 @@ export async function gameData(rawId: string): Promise<GameData> {
       .order("created_at"),
     db
       .from("session_players")
-      .select("child_profiles(nickname,avatar)")
+      .select("child_id,child_profiles(nickname,avatar,archived_at)")
       .eq("session_id", id),
   ]);
   if (v.error || s.error || a.error || p.error)

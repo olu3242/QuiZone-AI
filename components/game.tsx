@@ -1,5 +1,5 @@
 "use client";
-import { zones } from "@/lib/content";
+import { practiceCopy, zones } from "@/lib/content";
 import type { GameData } from "@/lib/game-data";
 import {
   ArrowRight,
@@ -14,9 +14,11 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Allocation } from "./allocation";
 import { Blueprint } from "./blueprint";
+import { GlobalCompare } from "./global-compare";
 import { command, useFamily } from "./workspace";
 export function Game({
   id,
@@ -27,7 +29,9 @@ export function Game({
   initialData: GameData;
   initialNow: number;
 }) {
-  const { refresh } = useFamily();
+  const { data: family, refresh } = useFamily();
+  const hintsPaused = family?.flags?.q_hints === false;
+  const router = useRouter();
   const [game, setGame] = useState<GameData | null>(initialData),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -35,17 +39,43 @@ export function Game({
     [hint, setHint] = useState(""),
     [reason, setReason] = useState("technical"),
     [notice, setNotice] = useState(""),
-    [now, setNow] = useState(initialNow);
+    [now, setNow] = useState(initialNow),
+    [devices, setDevices] = useState<{ label: string; you: boolean }[]>([]);
+  const live =
+    !!game &&
+    ["lobby", "ready", "active", "paused"].includes(game.session.state);
+  // Multi-device presence: each adult device with this game open checks in.
+  useEffect(() => {
+    if (!live) return;
+    const beat = () =>
+      command("presence", { session: id })
+        .then((r: { devices: { label: string; you: boolean }[] }) =>
+          setDevices(r.devices),
+        )
+        .catch(() => {});
+    const first = setTimeout(beat, 0),
+      t = setInterval(beat, 10000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(t);
+    };
+  }, [id, live]);
+  // Polls and post-action reloads overlap (and other devices act too): apply only the
+  // newest response so an older in-flight read can't roll the screen back.
+  const loadSeq = useRef(0);
   const load = useCallback(async () => {
+    const mine = ++loadSeq.current;
     try {
       const r = await fetch("/api/session?id=" + encodeURIComponent(id), {
           cache: "no-store",
         }),
         j = await r.json();
       if (!r.ok) throw new Error(j.error);
+      if (mine !== loadSeq.current) return;
       setGame(j);
       setError("");
     } catch (e) {
+      if (mine !== loadSeq.current) return;
       setError(
         e instanceof Error
           ? e.message
@@ -76,6 +106,7 @@ export function Game({
           "Your report is saved for review. Follow its status in Parent Hub.",
         );
       await load();
+      if (action === "hint") await refresh();
       if (action === "answer" || action === "plan" || action === "blueprint") {
         setChoice(null);
         setHint("");
@@ -88,6 +119,24 @@ export function Game({
           : "Could not save. Retry when connected.",
       );
     } finally {
+      setBusy(false);
+    }
+  }
+  async function playAgain() {
+    if (!game) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await command("create", {
+        challenge: game.version.challenge_id,
+        children: game.players
+          .filter((p) => !p.child_profiles.archived_at)
+          .map((p) => p.child_id),
+      });
+      await refresh();
+      router.push("/play/" + r.session);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not start a rematch.");
       setBusy(false);
     }
   }
@@ -110,6 +159,9 @@ export function Game({
       </div>
     );
   const { session, version, steps, answers, players } = game,
+    rematch = players
+      .filter((p) => !p.child_profiles.archived_at)
+      .map((p) => p.child_id),
     c = version.challenges,
     z = zones.find((z) => z.mode === c.mode) || zones[0],
     current = steps.find((s) => !answers.some((a) => a.step_id === s.id)),
@@ -127,6 +179,9 @@ export function Game({
         <span className="pill">
           {z.icon} {z.name}
         </span>
+        {session.practice && (
+          <span className="pill practice-pill">{practiceCopy.pill}</span>
+        )}
         <span className="muted">{session.code}</span>
       </div>
       <div className="page-heading">
@@ -183,6 +238,15 @@ export function Game({
             <Users size={16} /> {players.length} explorers · One shared screen ·
             Guardian-led
           </div>
+          {devices.length > 0 && (
+            <p className="devices" aria-live="polite">
+              <strong>Open on:</strong>{" "}
+              {devices
+                .map((d) => (d.you ? `${d.label} (this device)` : d.label))
+                .join(" · ")}
+              <span className="muted"> · Game code {session.code}</span>
+            </p>
+          )}
           <p>
             Read the scenario together. Make room for everyone’s ideas before
             choosing an answer.
@@ -237,7 +301,11 @@ export function Game({
           <Trophy size={58} />
           <p className="eyebrow">LOOK WHAT YOU FIGURED OUT TOGETHER</p>
           <h2>That’s a family win.</h2>
-          <p>You shared ideas, made decisions, and completed your adventure.</p>
+          <p>
+            {session.practice
+              ? practiceCopy.result
+              : "You shared ideas, made decisions, and completed your adventure."}
+          </p>
           <strong>
             {session.total_score}
             <span>team points</span>
@@ -258,12 +326,26 @@ export function Game({
             </p>
           </div>
           <div className="button-row">
-            <Link className="btn" href="/challenges">
+            {rematch.length > 0 && (
+              <button
+                className="btn"
+                disabled={busy}
+                onClick={() => void playAgain()}
+              >
+                {busy ? "Setting up…" : "Play again"} <ArrowRight size={17} />
+              </button>
+            )}
+            <Link
+              className={rematch.length ? "btn secondary" : "btn"}
+              href="/challenges"
+            >
               One more adventure <ArrowRight size={17} />
             </Link>
-            <Link className="btn secondary" href="/parent">
-              View parent summary
-            </Link>
+            {family?.household?.role !== "member" && !family?.locked && (
+              <Link className="btn secondary" href="/parent">
+                View parent summary
+              </Link>
+            )}
           </div>
         </section>
       ) : current ? (
@@ -367,18 +449,31 @@ export function Game({
               )}
               <button
                 className="btn secondary full"
-                disabled={busy}
+                disabled={busy || hintsPaused}
                 onClick={() => void act("hint", {})}
               >
                 <Sparkles size={16} /> Ask for a hint
               </button>
-              <small>A guardian can enable hints in Family preferences.</small>
+              {family?.qUsage && !hintsPaused && (
+                <small>
+                  {family.qUsage.used} of {family.qUsage.limit} family hints
+                  used today.
+                </small>
+              )}
+              <small>
+                {hintsPaused
+                  ? "Hints are paused right now."
+                  : "A guardian can enable hints in Family preferences."}
+              </small>
             </div>
           </aside>
         </div>
       ) : (
         <p role="status">Refreshing your saved session…</p>
       )}
+      {c.mode === "world" &&
+        session.state === "complete" &&
+        !session.practice && <GlobalCompare session={session.id} />}
       {answers.length > 0 && (
         <section className="answer-history">
           <h2>Your thinking trail</h2>
@@ -389,7 +484,10 @@ export function Game({
                   <Check size={18} />
                 </span>
                 <h3>{steps.find((s) => s.id === a.step_id)?.prompt}</h3>
-                <span className="pill">+{a.points} points</span>
+                <span className="pill">
+                  +{a.points} points
+                  {a.bonus ? ` · includes +${a.bonus} bonus` : ""}
+                </span>
               </div>
               <p>
                 <strong>Your choice:</strong>{" "}

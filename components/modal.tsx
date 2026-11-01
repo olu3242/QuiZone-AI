@@ -3,9 +3,11 @@ import { useEffect, useRef, type ReactNode } from "react";
 export function Modal({
   children,
   onClose,
+  labelledBy = "launch-title",
 }: {
   children: ReactNode;
   onClose: () => void;
+  labelledBy?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -21,7 +23,7 @@ export function Modal({
     <dialog
       ref={dialog}
       className="modal-dialog"
-      aria-labelledby="launch-title"
+      aria-labelledby={labelledBy}
       onCancel={onClose}
     >
       <div>{children}</div>

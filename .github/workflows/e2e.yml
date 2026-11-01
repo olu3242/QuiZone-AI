@@ -1,0 +1,53 @@
+name: QuiZone browser E2E
+on:
+  push:
+    branches: [main, 'work/**', 'claude/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: psql --version
+      - run: npx playwright install --with-deps chromium
+      # Local Supabase stack: real Postgres, GoTrue Auth, PostgREST, Mailpit.
+      # Uses the CLI's public local-only keys; no repository secrets are needed.
+      - run: npx supabase start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta
+      - name: Configure app for the local stack
+        run: |
+          npx supabase status -o env > /tmp/sb.env
+          . /tmp/sb.env
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
+          } > .env.local
+          echo "E2E_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "E2E_SUPABASE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "E2E_MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+          # SafeZone suite performs operator-only SQL (staff grant, feature flag).
+          echo "E2E_DB_URL=$DB_URL" >> "$GITHUB_ENV"
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+      - name: Start app
+        run: |
+          nohup npx next start -p 3000 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/api/health && break; sleep 1; done
+      - run: npm run test:e2e
+        env:
+          E2E_BASE_URL: http://localhost:3000
+      - name: Database function lint (plpgsql_check)
+        run: npx supabase db lint --level error --fail-on error
+      - if: failure()
+        run: tail -100 /tmp/next.log

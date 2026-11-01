@@ -31,6 +31,7 @@ export const config = {
     "/parent/:path*",
     "/passport/:path*",
     "/world/:path*",
+    "/safezone/:path*",
     "/admin/:path*",
     "/api/:path*",
     "/reset-password",

@@ -1,9 +1,14 @@
 "use client";
-import { zones } from "@/lib/content";
+import { WorkflowsConsole } from "../workflows-console";
+import { MaintenancePanel } from "../maintenance-panel";
+import { ExplorerLocked } from "../explorer-mode";
+import { difficulties, subjects, zones } from "@/lib/content";
 import type { AppAction } from "@/lib/validation";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
+import { CmsVersions } from "../cms-editor";
+import { OpsOverview } from "../ops-overview";
 import { Empty, Feedback, Heading, zoneFor } from "../family-ui";
 import { command, useFamily } from "../workspace";
 export function AdminPage() {
@@ -11,6 +16,7 @@ export function AdminPage() {
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  if (data.locked) return <ExplorerLocked />;
   if (!data.admin)
     return (
       <Empty
@@ -39,6 +45,9 @@ export function AdminPage() {
         description="Staff access is assigned in the database, never through a profile preference."
       />
       <Feedback message={message} />
+      <OpsOverview />
+      <MaintenancePanel />
+      <WorkflowsConsole />
       <div className="content-split">
         <section>
           <h2>Challenge library</h2>
@@ -46,6 +55,68 @@ export function AdminPage() {
             <article className="panel summary-card" key={c.id}>
               <h3>{c.title}</h3>
               <p>{zoneFor(c.mode).name}</p>
+              <form
+                className="meta-editor"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const f = new FormData(e.currentTarget);
+                  void execute("cms_meta", {
+                    challenge: c.id,
+                    subject: f.get("subject"),
+                    difficulty: f.get("difficulty"),
+                  });
+                }}
+              >
+                <label>
+                  Subject
+                  <select name="subject" defaultValue={c.subject}>
+                    {Object.entries(subjects).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Difficulty
+                  <select name="difficulty" defaultValue={c.difficulty}>
+                    {Object.entries(difficulties).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className="btn small secondary" disabled={busy}>
+                  Save details
+                </button>
+              </form>
+              {c.mode === "world" && (
+                <form
+                  className="meta-editor"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void execute("cms_country", {
+                      challenge: c.id,
+                      country: new FormData(e.currentTarget).get("country"),
+                    });
+                  }}
+                >
+                  <label>
+                    Country (passport stamp)
+                    <input
+                      name="country"
+                      required
+                      maxLength={56}
+                      defaultValue={c.country ?? ""}
+                      placeholder="Kenya"
+                    />
+                  </label>
+                  <button className="btn small secondary" disabled={busy}>
+                    Save country
+                  </button>
+                </form>
+              )}
               {c.versions.map((v) => (
                 <div className="session-row" key={v.id}>
                   <span>
@@ -72,6 +143,7 @@ export function AdminPage() {
                   )}
                 </div>
               ))}
+              <CmsVersions challenge={c} busy={busy} run={execute} />
             </article>
           ))}
           <h2>Moderation queue</h2>

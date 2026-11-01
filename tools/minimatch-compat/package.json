@@ -1,0 +1,10 @@
+{
+  "name": "@quizone/minimatch-compat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Callable minimatch@3-shaped facade over patched minimatch@11 for the ESLint toolchain",
+  "main": "index.cjs",
+  "dependencies": {
+    "minimatch-patched": "npm:minimatch@11.0.3"
+  }
+}
