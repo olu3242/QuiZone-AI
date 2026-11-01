@@ -1,5 +1,11 @@
 "use client";
-import { difficulties, subjects, zoneOpen, zones } from "@/lib/content";
+import {
+  difficulties,
+  practiceCopy,
+  subjects,
+  zoneOpen,
+  zones,
+} from "@/lib/content";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,6 +29,7 @@ export function ChallengesPage({
   const [filter, setFilter] = useState("all"),
     [subject, setSubject] = useState("all"),
     [level, setLevel] = useState("all"),
+    [practice, setPractice] = useState(false),
     [selected, setSelected] = useState(initialSelected),
     [players, setPlayers] = useState<string[]>([]),
     [error, setError] = useState(""),
@@ -40,6 +47,7 @@ export function ChallengesPage({
       const result = await command("create", {
         challenge: selected,
         children: players,
+        ...(practice ? { practice: true } : {}),
       });
       await refresh();
       router.push("/play/" + result.session);
@@ -180,6 +188,14 @@ export function ChallengesPage({
                     <strong>{c.nickname}</strong>
                   </label>
                 ))}
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    checked={practice}
+                    onChange={(e) => setPractice(e.target.checked)}
+                  />
+                  {practiceCopy.option}
+                </label>
                 <p className="muted">
                   Your family’s session limit: {data.permissions?.minutes}{" "}
                   minutes.

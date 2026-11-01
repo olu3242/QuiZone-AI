@@ -300,6 +300,7 @@ export const actionSchema = z.discriminatedUnion("action", [
     data: z.object({
       challenge: z.string().uuid(),
       children: z.array(z.string().uuid()).min(1).max(8),
+      practice: z.boolean().optional(),
     }),
   }),
   z.object({

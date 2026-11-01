@@ -135,3 +135,10 @@ export const difficulties: Record<string, string> = {
   explorer: "Explorer",
   challenger: "Challenger",
 };
+export const practiceCopy = {
+  option:
+    "Practice round: play for fun. No XP, badges, or passport stamps are recorded.",
+  pill: "Practice round",
+  result:
+    "Practice round complete. Nothing was added to XP, badges, or stamps.",
+};

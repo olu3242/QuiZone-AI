@@ -1,5 +1,5 @@
 "use client";
-import { zones } from "@/lib/content";
+import { practiceCopy, zones } from "@/lib/content";
 import type { GameData } from "@/lib/game-data";
 import {
   ArrowRight,
@@ -151,6 +151,9 @@ export function Game({
         <span className="pill">
           {z.icon} {z.name}
         </span>
+        {session.practice && (
+          <span className="pill practice-pill">{practiceCopy.pill}</span>
+        )}
         <span className="muted">{session.code}</span>
       </div>
       <div className="page-heading">
@@ -261,7 +264,11 @@ export function Game({
           <Trophy size={58} />
           <p className="eyebrow">LOOK WHAT YOU FIGURED OUT TOGETHER</p>
           <h2>That’s a family win.</h2>
-          <p>You shared ideas, made decisions, and completed your adventure.</p>
+          <p>
+            {session.practice
+              ? practiceCopy.result
+              : "You shared ideas, made decisions, and completed your adventure."}
+          </p>
           <strong>
             {session.total_score}
             <span>team points</span>

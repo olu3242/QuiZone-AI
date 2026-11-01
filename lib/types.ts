@@ -43,6 +43,7 @@ export type Session = {
   challenge_version_id: string;
   total_score: number;
   completed_at: string | null;
+  practice?: boolean;
 };
 export type Answer = {
   id: string;

@@ -117,6 +117,7 @@ export function ParentPage() {
                           s.completed_at || s.created_at,
                         ).toLocaleDateString()}{" "}
                         · {s.total_score} team points
+                        {s.practice ? " · practice round (no XP)" : ""}
                       </small>
                     </div>
                     <Link href={"/play/" + s.id}>Review →</Link>

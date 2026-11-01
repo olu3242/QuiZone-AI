@@ -3820,3 +3820,7 @@ input[type="radio"] {
 .badge-list.family {
   margin-bottom: 26px;
 }
+.practice-pill {
+  background: #ecf8fb;
+  color: #0b5466;
+}
