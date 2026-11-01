@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-> **Current state (2026-11-01):** the app is a guardian-led shared-screen pilot, not the starter kit described below. Start with `docs/QUIZONE_CURRENT_STATE.md`, `docs/QUIZONE_FEATURE_MATRIX.md`, and `docs/QUIZONE_REMAINING_GAPS.md`. The starter-kit sections below are historical; their architectural and safety rules still apply. Hosted E2E is not certified.
+> **Current state (2026-11-01):** the app is a guardian-led shared-screen pilot, not the starter kit described below. Start with `docs/QUIZONE_UNIFIED_STATUS.md`, `docs/QUIZONE_MASTER_ARCHITECTURE.md`, and `docs/QUIZONE_RELEASE_BLOCKERS.md`. SafeZone is **card-only by owner decision** and ships behind `private.feature_flags.safezone` (off). The starter-kit sections below are historical; their architectural and safety rules still apply. Hosted E2E is not certified.
 >
-> Verification commands: `npm test` (unit + PGlite DB, applies every migration in order), `npm run test:e2e` (browser, needs a running app + Supabase stack — see `docs/QUIZONE_E2E_CERTIFICATION.md`), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run audit`. Add new SQL as **additive** migrations routed through `public.qz_command`; never grant clients table writes.
+> Verification commands: `npm test` (unit + PGlite DB, applies every migration in order), `npm run test:e2e` (browser, needs a running app + Supabase stack — see `docs/QUIZONE_E2E_CERTIFICATION.md`), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run audit`. Add new SQL as **additive** migrations routed through `public.qz_command`; never grant clients table writes. Every post-pilot migration needs a matching `supabase/rollback/*.down.sql` (enforced by `tests/rollback.test.ts`).
 
 Instructions for Claude (via Claude Code or any agentic coding session)
 working in this repository.

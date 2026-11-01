@@ -1,5 +1,7 @@
 # QuiZone E2E certification record
 
+> Latest counts are in `QUIZONE_E2E_RESULTS.md` (75 unit/DB, 42 browser across family, resilience, and SafeZone suites). The tables below record the first certification run.
+
 **Certification level reached: LOCAL REAL-STACK.** Hosted certification: **NOT CERTIFIED** (no hosted QuiZone backend).
 
 ## Environment
