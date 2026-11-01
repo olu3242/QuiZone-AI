@@ -4,11 +4,13 @@ Ordered by: release blockers → security → core journeys → breadth. Each ba
 
 ## Release blockers (external — need you)
 
-1. **Hosted Supabase project** for UAT (none exists in the connected org).
+1. **Hosted Supabase project** for UAT. The connector sees none, but the GitHub integration links `orjremljufkflomsjelr`. Confirm and grant access.
 2. **Vercel connector scope** for `qui-zone-ai` env/deployments, plus the 3 env vars.
 3. **Merge path to `main`** — `main` cannot build until the app lands.
 4. **Legal/product decisions**: approved age bands (8–17 is a placeholder), verifiable parental consent program, safety-record retention vs erasure on account deletion, international privacy review for WorldZone.
 5. **Custom SMTP** and a test-inbox strategy for hosted E2E.
+
+6. **SafeZone decisions**: amend `FAMILY.md` §2 or keep card-only; moderator vetting program; enablement sign-off (`SAFEZONE_SAFETY_REVIEW.md` §4).
 
 ## Next engineering batches
 

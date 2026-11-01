@@ -4,14 +4,14 @@
 
 ## Inspection results
 
-| Target                   | Observed                                                                                                                                                         | Status                                   |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| GitHub Actions           | `ci.yml` (audit/test/lint/type/build) now also runs on `claude/**` and PRs to any base; new `e2e.yml`                                                            | Pending first run on this branch         |
-| Vercel project           | `qui-zone-ai` (`prj_At3aDMHerUaIExGySYmhvZEslB49`) in team Eduradius LLC is visible to the connector, but env-var listing returns 404 and deployment listing 403 | **BLOCKED — connector permission scope** |
-| Vercel production branch | `main` has no `app/` → builds fail until PR #1 (and this stack) merge                                                                                            | **Deployment blocker**                   |
-| Supabase                 | Connected org has Foundry, MEDLINK, BTG AI (all inactive). **No QuiZone project**                                                                                | **BLOCKED — project needed**             |
-| Migrations               | 3 files, applied cleanly to Supabase Postgres 17 locally; not applied anywhere hosted                                                                            | Ready for review                         |
-| Auth callbacks           | Code uses `${NEXT_PUBLIC_SITE_URL}/auth/callback` and `.../auth/callback?next=/reset-password`                                                                   | Must be allow-listed per environment     |
+| Target                   | Observed                                                                                                                                                                                                                                                           | Status                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| GitHub Actions           | `ci.yml` (audit/test/lint/type/build) now also runs on `claude/**` and PRs to any base; new `e2e.yml`                                                                                                                                                              | Pending first run on this branch                                                            |
+| Vercel project           | `qui-zone-ai` (`prj_At3aDMHerUaIExGySYmhvZEslB49`) in team Eduradius LLC is visible to the connector, but env-var listing returns 404 and deployment listing 403                                                                                                   | **BLOCKED — connector permission scope**                                                    |
+| Vercel production branch | `main` has no `app/` → builds fail until PR #1 (and this stack) merge                                                                                                                                                                                              | **Deployment blocker**                                                                      |
+| Supabase                 | Connector org has Foundry, MEDLINK, BTG AI (all inactive). **However**, the repo's Supabase GitHub integration reports a "Supabase Preview" check linked to project `orjremljufkflomsjelr` (skipped on PR #2). That project is in an org the connector cannot see. | **BLOCKED — grant connector access to that org, or confirm it is the intended UAT project** |
+| Migrations               | 3 files, applied cleanly to Supabase Postgres 17 locally; not applied anywhere hosted                                                                                                                                                                              | Ready for review                                                                            |
+| Auth callbacks           | Code uses `${NEXT_PUBLIC_SITE_URL}/auth/callback` and `.../auth/callback?next=/reset-password`                                                                                                                                                                     | Must be allow-listed per environment                                                        |
 
 ## Missing environment variables (names only)
 
@@ -26,6 +26,11 @@ Operator machine only (never in Vercel or the repo):
 - [ ] `SUPABASE_DB_URL` or `supabase login` + `supabase link` for migration push
 
 Not needed: any service-role key (the app never uses one). Future, when Q goes live: a server-only provider key (name TBD with the provider choice).
+
+## SafeZone operator controls (no app UI by design)
+
+- [ ] Leave `private.feature_flags.safezone = false` until the gates in `SAFEZONE_SAFETY_REVIEW.md` §4 close.
+- [ ] Grant moderators with SQL into `private.staff`, only after vetting and training.
 
 ## Supabase project settings required
 

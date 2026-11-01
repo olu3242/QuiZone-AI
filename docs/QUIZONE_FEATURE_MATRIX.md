@@ -88,6 +88,22 @@ Legend — **VERIFIED**: automated test passed this session on a real Supabase s
 | Moderation queue + audited decisions                    | UNVERIFIED        | DB tests                                                             |
 | Educator classes/assignments/reporting                  | NOT IMPL          | PRD marks Teacher as post-MVP                                        |
 
+## J. SafeZone (youth town halls)
+
+Full map in `SAFEZONE_EVIDENCE.md`. All rows are behind the off-by-default `safezone` flag.
+
+| Feature                                                                  | Status   | Evidence                                       |
+| ------------------------------------------------------------------------ | -------- | ---------------------------------------------- |
+| Lobby, topics, upcoming, history, safety info                            | VERIFIED | SafeZone E2E 1–3, 14                           |
+| Guardian consent per session (password + DB `amr` check), withdrawal     | VERIFIED | E2E 3, 4, 14; DB tests                         |
+| Moderator scheduling, lifecycle, assignment                              | VERIFIED | E2E 2, 6; DB tests                             |
+| Raise hand, speaking turns, card contributions, pre-publication approval | VERIFIED | E2E 7, 8                                       |
+| Polls (one vote per explorer, hidden results until closed)               | VERIFIED | E2E 9                                          |
+| Reports, removal, emergency closure, guardian notifications              | VERIFIED | E2E 10, 11; DB                                 |
+| Free-text contributions                                                  | BLOCKED  | `FAMILY.md` §2 conflict (owner decision)       |
+| AI facilitator, impact tracker                                           | NOT IMPL | Provider not chosen; no post-session lifecycle |
+| Verified parental consent, moderator vetting                             | BLOCKED  | Legal/operational                              |
+
 ## Cross-cutting
 
 | Feature                                             | Status               | Evidence                                                      |

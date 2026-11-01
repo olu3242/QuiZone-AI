@@ -19,20 +19,21 @@
 | `2063b92` | QZ-02    | Guardian data rights: explorer edit/archive/restore/delete, JSON export, password change, global sign-out, account deletion.                                                                                            |
 | `e0820c6` | QZ-01/09 | Real-stack browser E2E (Playwright + axe) and CI job; fixed 22 serious contrast failures and hero overflow at all widths.                                                                                               |
 | `e8562b4` | QZ-03    | Server-timed QuickZone speed + streak scoring; Play again.                                                                                                                                                              |
+| `088b231` | SafeZone | Guardian-approved, moderated, card-based town halls behind an off-by-default flag. See `SAFEZONE_SPEC.md`, `SAFEZONE_SAFETY_REVIEW.md`, `SAFEZONE_EVIDENCE.md`.                                                         |
 
 ## Verification run in this session
 
-| Gate                                                         | Result                                                             |
-| ------------------------------------------------------------ | ------------------------------------------------------------------ |
-| Unit + PGlite DB suites (`npm test`)                         | **46 pass / 0 fail / 0 skip** (baseline was 31)                    |
-| Browser E2E on local Supabase CLI stack (`npm run test:e2e`) | **17 pass / 0 fail / 0 skip**                                      |
-| axe WCAG 2.2 AA (serious/critical) on 10 routes              | 0 violations (after fixes; 22 before)                              |
-| `npm run lint`, `npm run typecheck`, `npm run build`         | Pass                                                               |
-| `npm audit` (full tree, `--audit-level=low`)                 | 0 vulnerabilities (was 1 critical runtime + moderate dev chain)    |
-| `supabase db lint --level error` (plpgsql_check)             | 0 errors                                                           |
-| Migrations applied on Supabase Postgres 17 (CLI stack)       | 3/3 applied; RLS on all 16 public tables                           |
-| Hosted Supabase / Vercel preview UAT                         | **Not executed — blocked** (see `QUIZONE_DEPLOYMENT_READINESS.md`) |
-| GitHub Actions for this branch                               | Pending first run after push                                       |
+| Gate                                                         | Result                                                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Unit + PGlite DB suites (`npm test`)                         | **62 pass / 0 fail / 0 skip** (baseline was 31)                                             |
+| Browser E2E on local Supabase CLI stack (`npm run test:e2e`) | **32 pass / 0 fail / 0 skip** (17 family + 15 SafeZone); also green in GitHub Actions `e2e` |
+| axe WCAG 2.2 AA (serious/critical) on 10 routes              | 0 violations (after fixes; 22 before)                                                       |
+| `npm run lint`, `npm run typecheck`, `npm run build`         | Pass                                                                                        |
+| `npm audit` (full tree, `--audit-level=low`)                 | 0 vulnerabilities (was 1 critical runtime + moderate dev chain)                             |
+| `supabase db lint --level error` (plpgsql_check)             | 0 errors                                                                                    |
+| Migrations applied on Supabase Postgres 17 (CLI stack)       | 3/3 applied; RLS on all 16 public tables                                                    |
+| Hosted Supabase / Vercel preview UAT                         | **Not executed — blocked** (see `QUIZONE_DEPLOYMENT_READINESS.md`)                          |
+| GitHub Actions for this branch                               | Pending first run after push                                                                |
 
 The local stack is the same Supabase images (GoTrue, PostgREST, Postgres 17, Mailpit) as hosted, so email confirmation, PKCE callback, password recovery, JWT-scoped RLS through PostgREST and `auth.users` deletion were exercised for real — but it is not hosted evidence (no real SMTP, domain, cookies over HTTPS, or Vercel runtime).
 

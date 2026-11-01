@@ -8,39 +8,39 @@ Base commit `ef9ab4e` contained only configuration and documentation. This branc
 
 ## Actual verification
 
-| Check | Observed result |
-|---|---|
-| Clean dependency install | Clean `npm@10.9.4 ci` passed with the local adapter and final lockfile |
-| Final PostgreSQL/domain validation suite | **31 passed, 0 failed, 0 skipped** |
-| Final typecheck | Passed |
-| Final lint | Passed, no errors or warnings |
-| Final production build | Passed on Next.js **16.3.8**; application pages, route handlers, and proxy emitted |
-| Production dependency audit | **0 known vulnerabilities** reported by `npm audit --omit=dev` |
-| Full dependency audit | **0 known vulnerabilities** across runtime and development dependencies; see retained audit JSON |
-| Git whitespace check | Passed before final documentation packaging |
-| Real browser/accessibility/device QA | Not executed; the supported browser-control capability was unavailable |
-| Hosted Auth / email / REST / cookie journeys | Not executed; no connected QuiZone backend |
-| Remote migration / production release | Not performed |
+| Check                                        | Observed result                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Clean dependency install                     | Clean `npm@10.9.4 ci` passed with the local adapter and final lockfile                           |
+| Final PostgreSQL/domain validation suite     | **31 passed, 0 failed, 0 skipped**                                                               |
+| Final typecheck                              | Passed                                                                                           |
+| Final lint                                   | Passed, no errors or warnings                                                                    |
+| Final production build                       | Passed on Next.js **16.3.8**; application pages, route handlers, and proxy emitted               |
+| Production dependency audit                  | **0 known vulnerabilities** reported by `npm audit --omit=dev`                                   |
+| Full dependency audit                        | **0 known vulnerabilities** across runtime and development dependencies; see retained audit JSON |
+| Git whitespace check                         | Passed before final documentation packaging                                                      |
+| Real browser/accessibility/device QA         | Not executed; the supported browser-control capability was unavailable                           |
+| Hosted Auth / email / REST / cookie journeys | Not executed; no connected QuiZone backend                                                       |
+| Remote migration / production release        | Not performed                                                                                    |
 
 The SQL suite runs the real migration and its transactional functions in PostgreSQL via PGlite. It supplies controlled Auth identity stubs and separate `authenticated` and `anon` roles. This is meaningful database integration coverage, not hosted Supabase certification or browser E2E.
 
 ## Implemented scope and limits
 
-| Area | Implemented | Remaining |
-|---|---|---|
-| Foundation | Responsive landing page, branding, App Router structure, navigation, loading/error/empty states | Browser/contrast/device verification |
-| Auth | Guardian signup, email callback, login, recovery/reset, signout, session refresh | Hosted email/SMTP, actual cookie verification, production abuse controls |
-| Family | Household consent, child nicknames/age/avatars/interests, permissions, session limit | Profile edit/archive, adult invitations, stronger verified consent, account export/deletion |
-| Engine/runtime | Versioned published content, lobby/ready/start/pause/cancel/expiry, five-second polling, server scores | Multi-device host/join, connection-presence states, synchronized timed reveal |
-| QuickZone | Three questions, saved answer feedback, participation/correctness points | Speed/streak scoring and synchronized reveal |
-| SolveZone | Six-category island allocation, hard budget validation, saved plan, storm/fuel decision steps | Richer event-dependent simulation, open reasoning rubric evaluation |
-| BuildZone | Structured shelter blueprint, server-calculated costs, saved design, guided budget/pitch decisions | Authored pitches, supporting media, broader rubric evaluation |
-| DebateZone | Assigned scenario position and six structured argument/evidence/rebuttal/closing/reflection steps | Moderated cross-family exchanges and richer evidence evaluation |
-| World/passport | Permission-gated country challenge, private stamps | Moderated global submissions, regional comparisons, structured peer reactions |
-| Progression | Saved per-child completion XP, activity-based skills, displayed milestones | Full configurable badge/level model |
-| Q | Permission-gated curated hints, metadata/output history | Live-model provider, safety/cost controls, provider fallback evaluations |
-| Parent Hub | Recorded session summaries, saved answer/plan review, conversation prompts, hint/report history, calendar entries | Notifications, full history pagination, account/privacy workflows |
-| Admin/safety | Draft challenge creation, explicit publication review, staff roles, report queue/status/audit trail | Full multi-step CMS editing/duplication/retirement, media review, operational moderation actions |
+| Area           | Implemented                                                                                                       | Remaining                                                                                        |
+| -------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Foundation     | Responsive landing page, branding, App Router structure, navigation, loading/error/empty states                   | Browser/contrast/device verification                                                             |
+| Auth           | Guardian signup, email callback, login, recovery/reset, signout, session refresh                                  | Hosted email/SMTP, actual cookie verification, production abuse controls                         |
+| Family         | Household consent, child nicknames/age/avatars/interests, permissions, session limit                              | Profile edit/archive, adult invitations, stronger verified consent, account export/deletion      |
+| Engine/runtime | Versioned published content, lobby/ready/start/pause/cancel/expiry, five-second polling, server scores            | Multi-device host/join, connection-presence states, synchronized timed reveal                    |
+| QuickZone      | Three questions, saved answer feedback, participation/correctness points                                          | Speed/streak scoring and synchronized reveal                                                     |
+| SolveZone      | Six-category island allocation, hard budget validation, saved plan, storm/fuel decision steps                     | Richer event-dependent simulation, open reasoning rubric evaluation                              |
+| BuildZone      | Structured shelter blueprint, server-calculated costs, saved design, guided budget/pitch decisions                | Authored pitches, supporting media, broader rubric evaluation                                    |
+| DebateZone     | Assigned scenario position and six structured argument/evidence/rebuttal/closing/reflection steps                 | Moderated cross-family exchanges and richer evidence evaluation                                  |
+| World/passport | Permission-gated country challenge, private stamps                                                                | Moderated global submissions, regional comparisons, structured peer reactions                    |
+| Progression    | Saved per-child completion XP, activity-based skills, displayed milestones                                        | Full configurable badge/level model                                                              |
+| Q              | Permission-gated curated hints, metadata/output history                                                           | Live-model provider, safety/cost controls, provider fallback evaluations                         |
+| Parent Hub     | Recorded session summaries, saved answer/plan review, conversation prompts, hint/report history, calendar entries | Notifications, full history pagination, account/privacy workflows                                |
+| Admin/safety   | Draft challenge creation, explicit publication review, staff roles, report queue/status/audit trail               | Full multi-step CMS editing/duplication/retirement, media review, operational moderation actions |
 
 ## Security evidence
 
