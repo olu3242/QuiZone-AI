@@ -142,7 +142,7 @@ export async function GET() {
         .eq("household_id", hid)
         .order("created_at"),
     ]);
-    const [childBadges, familyBadges, consents] = await Promise.all([
+    const [consents, childBadges, familyBadges] = await Promise.all([
       db
         .from("consent_records")
         .select("version,accepted_at")

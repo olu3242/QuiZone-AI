@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const before = z
       .string()
-      .datetime()
+      .datetime({ offset: true }) // Postgres returns +00:00, not Z
       .safeParse(req.nextUrl.searchParams.get("before"));
     if (!before.success)
       return NextResponse.json(

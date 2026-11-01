@@ -10,7 +10,7 @@
 | Vercel project           | `qui-zone-ai` (`prj_At3aDMHerUaIExGySYmhvZEslB49`) in team Eduradius LLC is visible to the connector, but env-var listing returns 404 and deployment listing 403                                                                                                   | **BLOCKED — connector permission scope**                                                    |
 | Vercel production branch | `main` has no `app/` → builds fail until PR #1 (and this stack) merge                                                                                                                                                                                              | **Deployment blocker**                                                                      |
 | Supabase                 | Connector org has Foundry, MEDLINK, BTG AI (all inactive). **However**, the repo's Supabase GitHub integration reports a "Supabase Preview" check linked to project `orjremljufkflomsjelr` (skipped on PR #2). That project is in an org the connector cannot see. | **BLOCKED — grant connector access to that org, or confirm it is the intended UAT project** |
-| Migrations               | 6 files, applied cleanly to Supabase Postgres 17 locally; a reverse script for every post-pilot migration in `supabase/rollback/` (enforced by `tests/rollback.test.ts`); not applied anywhere hosted                                                              | Ready for review                                                                            |
+| Migrations               | 14 files, applied cleanly to Supabase Postgres 17 locally; a reverse script for each of the 13 post-pilot migrations in `supabase/rollback/` (enforced by `tests/rollback.test.ts`); not applied anywhere hosted                                                   | Ready for review                                                                            |
 | Auth callbacks           | Code uses `${NEXT_PUBLIC_SITE_URL}/auth/callback` and `.../auth/callback?next=/reset-password`                                                                                                                                                                     | Must be allow-listed per environment                                                        |
 
 ## Missing environment variables (names only)
@@ -33,6 +33,7 @@ Not needed: any service-role key (the app never uses one). Future, when Q goes l
 - [ ] Grant moderators with SQL into `private.staff`, only after vetting and training.
 - [ ] Zone kill switches (`zone_quick`, `zone_solve`, `zone_build`, `zone_debate`, `zone_world`, `q_hints`) ship **on**. Pause one with `update private.feature_flags set enabled=false where flag='…'`. This blocks new sessions; ones already started can finish.
 - [ ] After any hosted E2E run, confirm `safezone` is `false` (the suite restores it, but verify).
+- [ ] Publishing a new family consent version gates all new play until each guardian accepts it: `insert into public.consent_versions(version,summary,body) values(…)`. Have the text legally reviewed first.
 
 ## Supabase project settings required
 
