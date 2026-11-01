@@ -21,6 +21,16 @@ export async function authorize(
     .eq("guardian_id", userId)
     .single();
   if (error || !house) throw new Error("Create a guardian household first.");
+  if ("child" in input.data) {
+    const { data: child, error } = await db
+      .from("child_profiles")
+      .select("id")
+      .eq("id", input.data.child)
+      .eq("household_id", house.id)
+      .single();
+    if (error || !child)
+      throw new Error("Explorer not found or permission denied.");
+  }
   if ("session" in input.data) {
     const { data: session, error } = await db
       .from("game_sessions")
@@ -36,13 +46,16 @@ export async function authorize(
       .from("child_profiles")
       .select("id,age")
       .eq("household_id", house.id)
+      .is("archived_at", null)
       .in("id", input.data.children);
     if (
       error ||
       !children ||
       children.length !== new Set(input.data.children).size
     )
-      throw new Error("All players must belong to your household.");
+      throw new Error(
+        "All players must be active explorers in your household.",
+      );
     const { data: version, error: versionError } = await db
       .from("challenge_versions")
       .select("min_age,max_age,challenges(mode)")

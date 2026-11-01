@@ -62,6 +62,21 @@ export const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("household"), data: householdSchema }),
   z.object({ action: z.literal("child"), data: childSchema }),
   z.object({
+    action: z.literal("child_update"),
+    data: childSchema.extend({ child: z.string().uuid() }),
+  }),
+  z.object({
+    action: z.literal("child_archive"),
+    data: z.object({ child: z.string().uuid(), archived: z.boolean() }),
+  }),
+  z.object({
+    action: z.literal("child_delete"),
+    data: z.object({
+      child: z.string().uuid(),
+      confirm: z.string().min(1).max(50),
+    }),
+  }),
+  z.object({
     action: z.literal("permissions"),
     data: z.object({
       world: z.boolean(),
@@ -138,6 +153,25 @@ export const actionSchema = z.discriminatedUnion("action", [
   }),
 ]);
 export type AppAction = z.infer<typeof actionSchema>;
+const password = z
+  .string()
+  .min(12, "Use at least 12 characters.")
+  .max(128, "Use at most 128 characters.");
+// Account-level operations live outside the gameplay command union so the
+// destructive path has its own route, validation, and session handling.
+export const accountSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("change-password"),
+    current: z.string().min(1).max(128),
+    next: password,
+  }),
+  z.object({ action: z.literal("signout-all") }),
+  z.object({
+    action: z.literal("delete"),
+    confirm: z.string().min(1).max(50),
+  }),
+]);
+export type AccountAction = z.infer<typeof accountSchema>;
 export function safeNext(value: string | null) {
   return value?.startsWith("/") &&
     !value.startsWith("//") &&

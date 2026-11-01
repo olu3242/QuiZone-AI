@@ -4,6 +4,7 @@ export type Child = {
   age: number;
   avatar: string;
   interest: string;
+  archived_at: string | null;
 };
 export type Challenge = {
   id: string;

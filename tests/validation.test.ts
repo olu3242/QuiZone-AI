@@ -1,6 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { actionSchema, childSchema, safeNext } from "../lib/validation";
+import {
+  accountSchema,
+  actionSchema,
+  childSchema,
+  safeNext,
+} from "../lib/validation";
 test("redirect targets stay on the local origin", () => {
   for (const value of ["https://evil.test", "//evil.test", "/\\evil.test"])
     assert.equal(safeNext(value), "/home");
@@ -75,4 +80,96 @@ test("allocation validator rejects overspending, missing categories, and negativ
       }).success,
       false,
     );
+});
+
+test("child management actions require a UUID and validated fields", () => {
+  const child = "7a4d1f8e-3b2c-4d5e-8f90-123456789abc";
+  assert.equal(
+    actionSchema.safeParse({
+      action: "child_update",
+      data: {
+        child,
+        nickname: "Star",
+        age: 9,
+        avatar: "owl",
+        interest: "world",
+      },
+    }).success,
+    true,
+  );
+  assert.equal(
+    actionSchema.safeParse({
+      action: "child_update",
+      data: {
+        child: "nope",
+        nickname: "Star",
+        age: 9,
+        avatar: "owl",
+        interest: "world",
+      },
+    }).success,
+    false,
+  );
+  assert.equal(
+    actionSchema.safeParse({
+      action: "child_update",
+      data: {
+        child,
+        nickname: "a@b.co",
+        age: 9,
+        avatar: "owl",
+        interest: "world",
+      },
+    }).success,
+    false,
+  );
+  assert.equal(
+    actionSchema.safeParse({
+      action: "child_archive",
+      data: { child, archived: "true" },
+    }).success,
+    false,
+  );
+  assert.equal(
+    actionSchema.safeParse({
+      action: "child_delete",
+      data: { child, confirm: "" },
+    }).success,
+    false,
+  );
+  // Destructive account operations are not reachable through the gameplay command route.
+  for (const action of ["account_delete", "export"])
+    assert.equal(actionSchema.safeParse({ action, data: {} }).success, false);
+});
+
+test("account actions enforce password policy and explicit confirmation", () => {
+  assert.equal(
+    accountSchema.safeParse({
+      action: "change-password",
+      current: "x",
+      next: "short",
+    }).success,
+    false,
+  );
+  assert.equal(
+    accountSchema.safeParse({
+      action: "change-password",
+      current: "old-password-1",
+      next: "a-much-longer-passphrase",
+    }).success,
+    true,
+  );
+  assert.equal(accountSchema.safeParse({ action: "delete" }).success, false);
+  assert.equal(
+    accountSchema.safeParse({ action: "delete", confirm: "Crew" }).success,
+    true,
+  );
+  assert.equal(
+    accountSchema.safeParse({ action: "signout-all" }).success,
+    true,
+  );
+  assert.equal(
+    accountSchema.safeParse({ action: "drop-tables" }).success,
+    false,
+  );
 });

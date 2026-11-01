@@ -20,6 +20,7 @@ import { useFamily } from "../workspace";
 export function HomePage() {
   const { data } = useFamily();
   if (!data) return null;
+  const crew = data.children.filter((c) => !c.archived_at);
   if (!data.household)
     return (
       <>
@@ -151,8 +152,8 @@ export function HomePage() {
         <aside>
           <div className="panel family-mini">
             <h3>Your adventure crew</h3>
-            {data.children.length ? (
-              data.children.map((c) => (
+            {crew.length ? (
+              crew.map((c) => (
                 <div className="crew-row" key={c.id}>
                   <span>{avatar[c.avatar]}</span>
                   <div>

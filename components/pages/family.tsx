@@ -2,13 +2,21 @@
 import { ArrowRight, Plus, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
-import { avatar, Feedback, Heading } from "../family-ui";
+import { AccountPrivacy } from "../account-privacy";
+import { ChildFields, childPayload, ExplorerCard } from "../explorer-card";
+import { Feedback, Heading } from "../family-ui";
 import { command, useFamily } from "../workspace";
 export function FamilyPage() {
   const { data, refresh } = useFamily();
   const [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  const active = data.children.filter((c) => !c.archived_at),
+    archived = data.children.filter((c) => c.archived_at);
+  async function saved(note: string) {
+    await refresh();
+    setMessage(note);
+  }
   async function save(
     e: React.FormEvent<HTMLFormElement>,
     action: "household" | "child" | "permissions",
@@ -22,12 +30,7 @@ export function FamilyPage() {
       action === "household"
         ? { name: fd.get("name"), consent: fd.get("consent") === "on" }
         : action === "child"
-          ? {
-              nickname: fd.get("nickname"),
-              age: Number(fd.get("age")),
-              avatar: fd.get("avatar"),
-              interest: fd.get("interest"),
-            }
+          ? childPayload(fd)
           : {
               world: fd.get("world") === "on",
               q: fd.get("q") === "on",
@@ -108,17 +111,24 @@ export function FamilyPage() {
               <span>{data.children.length} / 8 profiles</span>
             </div>
             <div className="children-grid">
-              {data.children.map((c) => (
-                <article className="panel child-card" key={c.id}>
-                  <span>{avatar[c.avatar]}</span>
-                  <h3>{c.nickname}</h3>
-                  <p>
-                    Age {c.age} · {c.interest}
-                  </p>
-                  <span className="pill">Family profile</span>
-                </article>
+              {active.map((c) => (
+                <ExplorerCard key={c.id} child={c} onSaved={saved} />
               ))}
             </div>
+            {archived.length > 0 && (
+              <details className="archived-explorers">
+                <summary>Archived explorers ({archived.length})</summary>
+                <p>
+                  Archived profiles keep their history but can’t join new
+                  adventures. They still count toward the eight-profile limit.
+                </p>
+                <div className="children-grid">
+                  {archived.map((c) => (
+                    <ExplorerCard key={c.id} child={c} onSaved={saved} />
+                  ))}
+                </div>
+              </details>
+            )}
             <section className="panel form-panel">
               <h2>
                 <Plus size={22} /> Add an explorer
@@ -128,47 +138,7 @@ export function FamilyPage() {
                 details. The current pilot supports ages 8–17 with a guardian.
               </p>
               <form onSubmit={(e) => void save(e, "child")}>
-                <div className="form-grid">
-                  <label>
-                    Nickname
-                    <input
-                      name="nickname"
-                      required
-                      minLength={2}
-                      maxLength={24}
-                      placeholder="Cosmic Fox"
-                    />
-                  </label>
-                  <label>
-                    Age in years
-                    <input
-                      name="age"
-                      type="number"
-                      required
-                      min={8}
-                      max={17}
-                      defaultValue={10}
-                    />
-                  </label>
-                  <label>
-                    Avatar
-                    <select name="avatar">
-                      <option value="fox">🦊 Fox</option>
-                      <option value="panda">🐼 Panda</option>
-                      <option value="owl">🦉 Owl</option>
-                      <option value="rocket">🚀 Rocket</option>
-                    </select>
-                  </label>
-                  <label>
-                    Favorite kind of discovery
-                    <select name="interest">
-                      <option value="science">Science</option>
-                      <option value="nature">Nature</option>
-                      <option value="creativity">Creativity</option>
-                      <option value="world">The world</option>
-                    </select>
-                  </label>
-                </div>
+                <ChildFields />
                 <button
                   className="btn"
                   disabled={busy || data.children.length >= 8}
@@ -229,6 +199,7 @@ export function FamilyPage() {
           </aside>
         </div>
       )}
+      <AccountPrivacy householdName={data.household?.name ?? null} />
     </>
   );
 }

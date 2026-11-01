@@ -40,10 +40,10 @@ before(async () => {
     "insert into auth.users values($1,now()),($2,now()),($3,now()),($4,null)",
     [A, B, STAFF, UNCONFIRMED],
   );
-  const migration = readdirSync("supabase/migrations").find((s) =>
-    s.endsWith("_quizone_pilot.sql"),
-  )!;
-  await db.exec(readFileSync("supabase/migrations/" + migration, "utf8"));
+  for (const migration of readdirSync("supabase/migrations")
+    .filter((s) => s.endsWith(".sql"))
+    .sort())
+    await db.exec(readFileSync("supabase/migrations/" + migration, "utf8"));
   await db.query("insert into private.staff values($1,'admin')", [STAFF]);
 });
 after(async () => {

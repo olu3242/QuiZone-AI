@@ -3401,3 +3401,73 @@ input[type="radio"] {
 }
 .allocation{margin-top:25px}.budget-summary{background:#eef4ff;border-radius:13px;padding:20px;margin-bottom:22px}.budget-summary>span{font-size:10px;color:#5273a6}.budget-summary>strong{float:right;font-size:20px;color:var(--blue)}.budget-summary .xp-track{margin-top:20px;background:#dce7f8}.budget-summary p{font-size:10px}.allocation-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.allocation-grid label>span{font-size:11px}.allocation>.btn{margin-top:20px}
 .design-choice{display:flex;gap:12px;align-items:center;padding:15px;border:1px solid var(--border);border-radius:12px;margin-bottom:12px}.design-choice strong{font-size:12px;flex:1}.design-choice>span{font-size:11px;color:var(--muted)}.shelter-preview{text-align:center;background:#f2ecff;border-radius:14px;padding:24px;margin-bottom:20px;color:var(--violet)}.shelter-preview>span{font-size:55px;line-height:1}.shelter-preview>div{font-size:35px}.shelter-preview p{font-size:11px;color:#7b68a1;margin-top:10px}
+
+/* QZ-02 guardian data controls */
+.btn.danger {
+  background: #c81e43;
+  border-color: #c81e43;
+  color: white;
+}
+.btn.danger:hover:not(:disabled) {
+  background: #a3122f;
+  color: white;
+}
+.card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.child-card.archived {
+  opacity: 0.85;
+  background: #f6f7fa;
+}
+.archived-explorers {
+  margin-bottom: 25px;
+}
+.archived-explorers summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 0;
+}
+.archived-explorers > p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 15px;
+}
+.account-panel {
+  margin-top: 30px;
+}
+.account-panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  margin: 24px 0 10px;
+}
+.account-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.danger-zone {
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid #f5c2cd;
+  border-radius: 14px;
+  background: #fff6f8;
+}
+.danger-zone h3 {
+  margin-top: 0;
+  color: #a3122f;
+}
+.danger-zone p {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+@media (max-width: 640px) {
+  .account-actions .btn {
+    width: 100%;
+  }
+}

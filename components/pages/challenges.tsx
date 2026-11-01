@@ -26,6 +26,7 @@ export function ChallengesPage({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   if (!data) return null;
+  const crew = data.children.filter((c) => !c.archived_at);
   const eligible = data.challenges.filter((c) =>
     c.versions.some((v) => v.status === "published"),
   );
@@ -82,7 +83,7 @@ export function ChallengesPage({
                 className="btn secondary full"
                 onClick={() => {
                   setSelected(c.id);
-                  setPlayers(data.children.map((c) => c.id));
+                  setPlayers(crew.map((c) => c.id));
                   setError("");
                 }}
               >
@@ -115,7 +116,7 @@ export function ChallengesPage({
             </p>
             {!data.household ? (
               <NeedHousehold />
-            ) : !data.children.length ? (
+            ) : !crew.length ? (
               <Empty
                 title="Add your first explorer."
                 description="Create a family profile before playing."
@@ -124,7 +125,7 @@ export function ChallengesPage({
               />
             ) : (
               <>
-                {data.children.map((c) => (
+                {crew.map((c) => (
                   <label className="player-choice" key={c.id}>
                     <input
                       type="checkbox"
