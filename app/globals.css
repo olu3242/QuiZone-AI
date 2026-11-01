@@ -3896,3 +3896,40 @@ input[type="radio"] {
   margin: 10px 0 14px;
   font-size: 13px;
 }
+
+/* QZ-28 operations overview */
+.ops {
+  margin-bottom: 30px;
+}
+.ops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.ops-grid > div {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.ops-grid dt {
+  font-size: 11px;
+  color: #4b5262;
+  font-weight: 700;
+}
+.ops-grid dd {
+  margin: 4px 0 0;
+}
+.ops-grid strong {
+  font-size: 22px;
+  display: block;
+}
+.ops-grid small {
+  font-size: 11px;
+  color: #4b5262;
+}
+.ops-flags {
+  font-size: 11px;
+  margin-top: 10px;
+}

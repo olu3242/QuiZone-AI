@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import { CmsVersions } from "../cms-editor";
+import { OpsOverview } from "../ops-overview";
 import { Empty, Feedback, Heading, zoneFor } from "../family-ui";
 import { command, useFamily } from "../workspace";
 export function AdminPage() {
@@ -40,6 +41,7 @@ export function AdminPage() {
         description="Staff access is assigned in the database, never through a profile preference."
       />
       <Feedback message={message} />
+      <OpsOverview />
       <div className="content-split">
         <section>
           <h2>Challenge library</h2>
