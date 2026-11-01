@@ -428,6 +428,39 @@ test("12. idea support, completion, and a privacy-safe summary", async () => {
     .waitFor();
 });
 
+test("12b. one journey: Parent Hub and the family data export include SafeZone activity", async () => {
+  await a.goto(`${BASE}/parent`);
+  const section = a.locator("section", { hasText: "SafeZone town halls" });
+  await section.getByText(TITLE).first().waitFor();
+  await section.getByText(`Nova as ${novaHandle}`).first().waitFor();
+  const ex = await api(a, "/api/account");
+  assert.equal(ex.status, 200);
+  assert.equal(ex.body.format, "quizone-household-export/v2");
+  const sz = ex.body.safezone;
+  assert.ok(
+    sz.townHallRegistrations.some(
+      (r: { handle: string }) => r.handle === novaHandle,
+    ),
+  );
+  assert.ok(
+    sz.contributions.some((c: { town_hall_options: { text: string } }) =>
+      /trusted adult/.test(c.town_hall_options.text),
+    ),
+    "export shows the card text the child chose",
+  );
+  assert.ok(sz.votes.length >= 1);
+  assert.equal(
+    JSON.stringify(ex.body).includes("Checked with participant"),
+    false,
+    "staff notes are not exported",
+  );
+  assert.equal(
+    JSON.stringify(ex.body).includes("Orbit"),
+    false,
+    "no other household's data",
+  );
+});
+
 test("13. responsive and accessible: lobby, room, and console at 390 / 1024 / 1280", async () => {
   const report: Record<string, unknown> = {};
   for (const [width, height] of [

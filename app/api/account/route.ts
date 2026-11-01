@@ -52,7 +52,7 @@ export async function GET() {
     ] = await Promise.all([
       db
         .from("guardian_permissions")
-        .select("world,q,minutes")
+        .select("world,q,minutes,safezone")
         .eq("household_id", hid)
         .single(),
       db
@@ -114,9 +114,39 @@ export async function GET() {
     ];
     if (parts.some((p) => p.error))
       return fail("Could not prepare your export.");
+    // SafeZone: every row is household-scoped by RLS; moderator notes are staff-only
+    // and deliberately excluded. Cards and choices resolve to the text the child chose.
+    const kidIds = (kids.data || []).map((k) => k.id);
+    const [szRegs, szSaid, szVotes, szReports, szNotes] = await Promise.all([
+      db
+        .from("town_hall_registrations")
+        .select(
+          "child_id,handle,status,consented_at,withdrawn_at,removed_reason,town_halls(title,starts_at,state)",
+        )
+        .eq("household_id", hid),
+      db
+        .from("town_hall_contributions")
+        .select("child_id,status,created_at,town_hall_options(kind,text)")
+        .in("child_id", kidIds),
+      db
+        .from("town_hall_votes")
+        .select("child_id,choice,created_at,town_hall_polls(question,options)")
+        .in("child_id", kidIds),
+      db
+        .from("safezone_reports")
+        .select("reason,severity,status,created_at")
+        .eq("household_id", hid),
+      db
+        .from("safezone_notifications")
+        .select("kind,message,created_at")
+        .eq("household_id", hid)
+        .order("created_at"),
+    ]);
+    if ([szRegs, szSaid, szVotes, szReports, szNotes].some((p) => p.error))
+      return fail("Could not prepare your export.");
     const body = {
       exportedAt: new Date().toISOString(),
-      format: "quizone-household-export/v1",
+      format: "quizone-household-export/v2",
       account: { email: user.email, createdAt: user.created_at },
       household: house,
       permissions: perm.data,
@@ -131,6 +161,13 @@ export async function GET() {
       scheduledGameNights: nights.data,
       guidedHints: hints.data,
       auditTrail: events.data,
+      safezone: {
+        townHallRegistrations: szRegs.data,
+        contributions: szSaid.data,
+        votes: szVotes.data,
+        reports: szReports.data,
+        notifications: szNotes.data,
+      },
     };
     return new NextResponse(JSON.stringify(body, null, 2), {
       headers: {

@@ -22,6 +22,7 @@ import {
   zoneFor,
 } from "../family-ui";
 import { command, useFamily } from "../workspace";
+import { SafeZoneGuardianSummary } from "../safezone/guardian-summary";
 export function ParentPage() {
   const { data, refresh } = useFamily(),
     [message, setMessage] = useState(""),
@@ -178,6 +179,7 @@ export function ParentPage() {
               session.
             </div>
           )}
+          <SafeZoneGuardianSummary explorers={data.children} />
         </section>
         <aside>
           <section className="panel form-panel">
